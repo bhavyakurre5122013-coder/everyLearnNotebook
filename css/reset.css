@@ -1,0 +1,294 @@
+/*
+=============================================================
+everyLearn — CSS Reset
+-------------------------------------------------------------
+Purpose:
+    Remove browser-specific default styling so the rest of the
+    application can use a predictable visual foundation.
+
+Rules:
+    • Keep this file limited to normalization.
+    • Component appearance belongs in the component stylesheets.
+=============================================================
+*/
+
+/* ---------------------------------------------------------
+   Box sizing
+--------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+/* ---------------------------------------------------------
+   Document
+--------------------------------------------------------- */
+
+html {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+
+    font-size: 16px;
+
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+
+    scroll-behavior: smooth;
+}
+
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* ---------------------------------------------------------
+   Typography
+--------------------------------------------------------- */
+
+body,
+button,
+input,
+select,
+textarea {
+    font-family: var(--font-family-ui);
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+figure,
+pre {
+    margin: 0;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+}
+
+
+p {
+    line-height: var(--line-height-normal);
+}
+
+
+small {
+    font-size: var(--font-size-sm);
+}
+
+
+/* ---------------------------------------------------------
+   Lists
+--------------------------------------------------------- */
+
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* ---------------------------------------------------------
+   Links
+--------------------------------------------------------- */
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+}
+
+
+/* ---------------------------------------------------------
+   Buttons
+--------------------------------------------------------- */
+
+button {
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+
+    font: inherit;
+
+    color: inherit;
+    background: none;
+
+    cursor: pointer;
+}
+
+
+button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------------------
+   Form controls
+--------------------------------------------------------- */
+
+input,
+textarea,
+select {
+    margin: 0;
+
+    font: inherit;
+}
+
+
+textarea {
+    overflow: auto;
+}
+
+
+select {
+    color: inherit;
+}
+
+
+/* ---------------------------------------------------------
+   Tables
+--------------------------------------------------------- */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+
+/* ---------------------------------------------------------
+   Images / media
+--------------------------------------------------------- */
+
+img,
+svg,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+
+img {
+    border: 0;
+}
+
+
+/* ---------------------------------------------------------
+   Interactive elements
+--------------------------------------------------------- */
+
+summary {
+    cursor: pointer;
+}
+
+
+[hidden],
+.hidden {
+    display: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   Accessibility
+--------------------------------------------------------- */
+
+/*
+    Visible focus remains available for keyboard users while
+    avoiding the old browser default outline style.
+*/
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+
+/*
+    Screen-reader-only utility.
+
+    This is intentionally not .hidden because elements using it
+    still need to remain available to assistive technology.
+*/
+
+.sr-only {
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    padding: 0 !important;
+    margin: -1px !important;
+
+    overflow: hidden !important;
+
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+
+    white-space: nowrap !important;
+
+    border: 0 !important;
+}
+
+
+/* ---------------------------------------------------------
+   Motion accessibility
+--------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+
+        scroll-behavior: auto !important;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   Text selection
+--------------------------------------------------------- */
+
+::selection {
+    color: var(--color-text-on-accent);
+    background: var(--color-primary);
+}

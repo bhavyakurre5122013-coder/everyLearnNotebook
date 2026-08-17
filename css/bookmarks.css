@@ -1,0 +1,111 @@
+/*
+=============================================================
+everyLearn — Bookmarks
+-------------------------------------------------------------
+Purpose:
+    Hierarchical location bookmarks and question bookmarks.
+=============================================================
+*/
+
+.bookmark-browser {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.bookmark-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-7);
+
+    padding: var(--space-6);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-surface);
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--duration-fast) var(--ease-standard),
+        border-color var(--duration-fast) var(--ease-standard);
+}
+
+.bookmark-item:hover {
+    background: var(--color-surface-soft);
+    border-color: var(--color-border-strong);
+}
+
+.bookmark-item-main {
+    min-width: 0;
+}
+
+.bookmark-item-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    font-weight: 700;
+}
+
+.bookmark-item-path {
+    margin-top: var(--space-2);
+
+    color: var(--color-text-secondary);
+
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+}
+
+.bookmark-item-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.bookmark-location-chip {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 25px;
+
+    padding-inline: var(--space-3);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-round);
+
+    color: var(--color-text-secondary);
+    background: var(--color-surface-soft);
+
+    font-size: var(--font-size-xs);
+}
+
+.bookmark-level-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.bookmark-level-option {
+    padding:
+        var(--space-3)
+        var(--space-4);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-round);
+
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+
+    cursor: pointer;
+}
+
+.bookmark-level-option:hover {
+    border-color: var(--color-primary);
+}
+
+.bookmark-level-option.active {
+    color: var(--color-primary);
+    border-color: var(--color-primary-border);
+    background: var(--color-primary-soft);
+}

@@ -1,0 +1,94 @@
+/*
+=============================================================
+everyLearn — Main
+-------------------------------------------------------------
+Purpose:
+    Global application appearance and shared page defaults.
+=============================================================
+*/
+
+html,
+body {
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+body {
+    font-family: var(--font-family-ui);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    transition:
+        background-color var(--duration-normal) var(--ease-standard),
+        color var(--duration-normal) var(--ease-standard);
+}
+
+.app {
+    min-height: 100vh;
+}
+
+.app-main {
+    min-height: calc(100vh - var(--ribbon-height));
+}
+
+.view {
+    width: min(
+        100% - (var(--page-padding) * 2),
+        var(--page-width)
+    );
+
+    margin-inline: auto;
+    padding-block: var(--space-12) var(--space-16);
+}
+
+.view.hidden {
+    display: none !important;
+}
+
+.view-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-10);
+    margin-bottom: var(--space-11);
+}
+
+.view-header h1 {
+    font-size: clamp(30px, 4vw, var(--font-size-display));
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.04em;
+}
+
+.view-header p {
+    margin-top: var(--space-4);
+    max-width: 760px;
+    color: var(--color-text-secondary);
+}
+
+.view-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.home-section + .home-section {
+    margin-top: var(--space-13);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-7);
+    margin-bottom: var(--space-6);
+}
+
+.section-header h2 {
+    font-size: var(--font-size-2xl);
+    letter-spacing: -0.02em;
+}
+
+.section-description {
+    margin-top: var(--space-2);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+}

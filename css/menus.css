@@ -1,0 +1,168 @@
+/*
+=============================================================
+everyLearn — Menus
+-------------------------------------------------------------
+Purpose:
+    Application menu, account menu, search and menu items.
+=============================================================
+*/
+
+.application-menu,
+.account-menu {
+    position: fixed;
+    z-index: var(--z-popover);
+
+    width: min(300px, calc(100vw - 24px));
+
+    padding: var(--space-2);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+}
+
+.application-menu.hidden,
+.account-menu.hidden {
+    display: none;
+}
+
+.menu-item {
+    width: 100%;
+
+    min-height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+
+    padding:
+        0
+        var(--space-5);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text);
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background: var(--color-surface-soft);
+}
+
+.menu-item-danger {
+    color: var(--color-danger);
+}
+
+.menu-item-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.menu-item-icon {
+    width: 20px;
+    height: 20px;
+
+    display: grid;
+    place-items: center;
+}
+
+.menu-item-icon img,
+.menu-item-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.menu-group-label {
+    padding:
+        var(--space-4)
+        var(--space-5);
+
+    color: var(--color-text-tertiary);
+
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+.menu-divider {
+    height: 1px;
+    margin: var(--space-2) 0;
+
+    background: var(--color-border);
+}
+
+/* ---------------------------------------------------------
+   Search
+--------------------------------------------------------- */
+
+.global-search {
+    position: relative;
+    width: min(620px, 100%);
+}
+
+.global-search-input {
+    width: 100%;
+    height: 42px;
+
+    padding:
+        0
+        80px
+        0
+        42px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    color: var(--color-text);
+    background: var(--color-surface-soft);
+
+    outline: none;
+}
+
+.global-search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-focus);
+}
+
+.global-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+
+    width: 18px;
+    height: 18px;
+
+    transform: translateY(-50%);
+
+    color: var(--color-text-secondary);
+
+    pointer-events: none;
+}
+
+.global-search-shortcut {
+    position: absolute;
+    right: 9px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    padding:
+        3px
+        var(--space-2);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+
+    font-size: 10px;
+}

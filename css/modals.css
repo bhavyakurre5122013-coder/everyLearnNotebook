@@ -1,0 +1,172 @@
+/*
+=============================================================
+everyLearn — Dialogs / Confirmation UI
+-------------------------------------------------------------
+Purpose:
+    Application-owned panels and confirmations.
+
+Important:
+    Browser confirm()/alert() should NOT be used.
+    All confirmations are rendered here.
+=============================================================
+*/
+
+.dialog-host {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-dialog);
+
+    pointer-events: none;
+}
+
+.dialog-backdrop {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--space-7);
+
+    background: rgba(0, 0, 0, 0.40);
+
+    pointer-events: auto;
+}
+
+.dialog {
+    width: min(860px, 100%);
+    max-height: min(90vh, 820px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+
+    background: var(--color-surface);
+
+    box-shadow: var(--shadow-lg);
+}
+
+.dialog.small {
+    width: min(460px, 100%);
+}
+
+.dialog.large {
+    width: min(1100px, 100%);
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-7);
+
+    padding:
+        var(--space-7)
+        var(--space-8);
+
+    border-bottom: 1px solid var(--color-border);
+}
+
+.dialog-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+}
+
+.dialog-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.dialog-body {
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: var(--space-8);
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+
+    padding:
+        var(--space-6)
+        var(--space-8);
+
+    border-top: 1px solid var(--color-border);
+
+    background: var(--color-surface-soft);
+}
+
+/* ---------------------------------------------------------
+   Confirmation dialog
+--------------------------------------------------------- */
+
+.confirmation-dialog {
+    width: min(460px, 100%);
+}
+
+.confirmation-icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    margin-bottom: var(--space-6);
+
+    border-radius: var(--radius-md);
+
+    color: #FFFFFF;
+    background: var(--color-danger);
+}
+
+.confirmation-icon img,
+.confirmation-icon svg {
+    width: 23px;
+    height: 23px;
+}
+
+.confirmation-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+}
+
+.confirmation-message {
+    margin-top: var(--space-3);
+
+    color: var(--color-text-secondary);
+
+    line-height: var(--line-height-relaxed);
+}
+
+/* ---------------------------------------------------------
+   Inline dialog / panel alternative
+--------------------------------------------------------- */
+
+.inline-panel {
+    width: 100%;
+
+    padding: var(--space-7);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface-soft);
+}
+
+.inline-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+
+    margin-bottom: var(--space-5);
+}

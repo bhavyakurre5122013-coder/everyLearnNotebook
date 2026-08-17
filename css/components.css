@@ -1,0 +1,331 @@
+/*
+=============================================================
+everyLearn — Shared Components
+-------------------------------------------------------------
+Purpose:
+    Small reusable controls shared across multiple features.
+=============================================================
+*/
+
+/* ---------------------------------------------------------
+   Base control language
+--------------------------------------------------------- */
+
+.action-button,
+.create-button,
+.edit-button,
+.delete-button,
+.save-button,
+.secondary-button,
+.ghost-button {
+    min-height: var(--control-height);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+
+    padding-inline: var(--space-6);
+
+    border-radius: var(--radius-sm);
+
+    font-size: var(--font-size-md);
+    font-weight: 600;
+
+    transition:
+        background-color var(--duration-fast) var(--ease-standard),
+        border-color var(--duration-fast) var(--ease-standard),
+        transform var(--duration-fast) var(--ease-standard),
+        box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.action-button:hover,
+.create-button:hover,
+.edit-button:hover,
+.delete-button:hover,
+.save-button:hover,
+.secondary-button:hover,
+.ghost-button:hover {
+    transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------------
+   Required action colors
+--------------------------------------------------------- */
+
+.create-button {
+    color: var(--action-create-foreground);
+    background: var(--action-create-background);
+}
+
+.create-button:hover {
+    background: var(--action-create-hover);
+}
+
+.edit-button {
+    color: var(--action-edit-foreground);
+    background: var(--action-edit-background);
+}
+
+.edit-button:hover {
+    background: var(--action-edit-hover);
+}
+
+.delete-button {
+    color: var(--action-delete-foreground);
+    background: var(--action-delete-background);
+}
+
+.delete-button:hover {
+    background: var(--action-delete-hover);
+}
+
+.save-button {
+    color: var(--action-save-foreground);
+    background: var(--action-save-background);
+}
+
+.save-button:hover {
+    background: var(--action-save-hover);
+}
+
+/* ---------------------------------------------------------
+   Neutral controls
+--------------------------------------------------------- */
+
+.secondary-button {
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+}
+
+.secondary-button:hover {
+    background: var(--color-surface-soft);
+    border-color: var(--color-border-strong);
+}
+
+.ghost-button {
+    color: var(--color-text-secondary);
+    background: transparent;
+}
+
+.ghost-button:hover {
+    color: var(--color-text);
+    background: var(--color-surface-soft);
+}
+
+/* ---------------------------------------------------------
+   Icon actions
+--------------------------------------------------------- */
+
+.icon-action {
+    width: 32px;
+    height: 32px;
+
+    display: inline-grid;
+    place-items: center;
+
+    padding: 0;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text);
+    background: var(--color-surface);
+
+    transition:
+        background-color var(--duration-fast) var(--ease-standard),
+        border-color var(--duration-fast) var(--ease-standard);
+}
+
+.icon-action:hover {
+    background: var(--color-surface-soft);
+    border-color: var(--color-border-strong);
+}
+
+.icon-action img,
+.icon-action svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ---------------------------------------------------------
+   Pills / metadata
+--------------------------------------------------------- */
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    min-height: 28px;
+
+    padding: 0 var(--space-4);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-round);
+
+    color: var(--color-text-secondary);
+    background: var(--color-surface-soft);
+
+    font-size: var(--font-size-xs);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 24px;
+
+    padding-inline: var(--space-3);
+
+    border-radius: var(--radius-round);
+
+    color: var(--color-text-secondary);
+    background: var(--color-surface-soft);
+
+    font-size: var(--font-size-xs);
+}
+
+/* ---------------------------------------------------------
+   Empty states
+--------------------------------------------------------- */
+
+.empty-state {
+    padding: var(--space-15) var(--space-7);
+
+    text-align: center;
+
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-xl);
+
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+}
+
+.empty-state strong {
+    display: block;
+    margin-bottom: var(--space-2);
+
+    color: var(--color-text);
+    font-size: var(--font-size-xl);
+}
+
+/* ---------------------------------------------------------
+   Inline status
+--------------------------------------------------------- */
+
+.status-text {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.status-success {
+    color: var(--color-success);
+}
+
+.status-danger {
+    color: var(--color-danger);
+}
+
+.status-warning {
+    color: var(--color-orange);
+}
+
+/* ---------------------------------------------------------
+   Standard monochrome markers
+--------------------------------------------------------- */
+
+.star-marker,
+.favorite-marker,
+.bookmark-marker {
+    display: inline-grid;
+    place-items: center;
+
+    color: var(--color-star);
+
+    background: transparent;
+
+    font-size: 20px;
+    line-height: 1;
+}
+
+.star-marker.empty {
+    color: var(--color-star-empty);
+}
+
+.favorite-marker {
+    color: var(--color-favorite);
+}
+
+.favorite-marker.empty {
+    color: var(--color-favorite-empty);
+}
+
+.bookmark-marker {
+    color: var(--color-bookmark);
+}
+
+.bookmark-marker.empty {
+    color: var(--color-bookmark-empty);
+}
+
+/* ---------------------------------------------------------
+   Dividers
+--------------------------------------------------------- */
+
+.divider {
+    height: 1px;
+    margin-block: var(--space-2);
+    background: var(--color-border);
+}
+
+/* ---------------------------------------------------------
+   Scrollbars
+--------------------------------------------------------- */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color:
+        var(--color-border-strong)
+        transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    border-radius: var(--radius-round);
+    background: var(--color-border-strong);
+}
+
+
+.marker-icon {
+    width: 12px;
+    height: 12px;
+    object-fit: contain;
+}
+
+
+.create-button img,
+.edit-button img,
+.delete-button img,
+.save-button img,
+.secondary-button img,
+.card-actions img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+}
+
+.create-card-icon img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}

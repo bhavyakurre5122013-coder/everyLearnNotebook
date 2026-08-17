@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="everyLearnNotebook — a modular learning and interactive question workspace."
+    >
+
+    <meta
+        name="theme-color"
+        content="#2563EB"
+    >
+
+    <title>everyLearnNotebook</title>
+
+    <!-- =====================================================
+         CSS
+         -----------------------------------------------------
+         Styles are split by responsibility so the application
+         does not become one giant HTML file.
+    ====================================================== -->
+
+    <!-- Base / design system -->
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/variables.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/subject-tokens.css">
+    <link rel="stylesheet" href="./css/main.css">
+
+    <!-- Layout and reusable components -->
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/workspace-tree.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/cards.css">
+    <link rel="stylesheet" href="./css/forms.css">
+
+    <!-- Feature-specific styles -->
+    <link rel="stylesheet" href="./css/editor.css">
+    <link rel="stylesheet" href="./css/questions.css">
+    <link rel="stylesheet" href="./css/question-metadata.css">
+    <link rel="stylesheet" href="./css/question-types.css">
+    <link rel="stylesheet" href="./css/practice.css">
+    <link rel="stylesheet" href="./css/bookmarks.css">
+
+    <!-- Overlays / menus / responsive behavior -->
+    <link rel="stylesheet" href="./css/menus.css">
+    <link rel="stylesheet" href="./css/modals.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         APPLICATION ROOT
+         -----------------------------------------------------
+         JavaScript renders the application into this root.
+         No user-created data is hard-coded into index.html.
+    ====================================================== -->
+
+    <div
+        id="app"
+        class="app"
+        aria-live="polite"
+    >
+
+        <!-- =================================================
+             APPLICATION SHELL
+        ================================================== -->
+
+        <header
+            id="appRibbon"
+            class="app-ribbon"
+        >
+
+            <!-- Home: the application teleport button -->
+            <button
+                id="homeButton"
+                class="ribbon-button"
+                type="button"
+                title="Home"
+                aria-label="Home"
+            >
+                <img
+                    src="./assets/icons/ui/home.svg"
+                    alt=""
+                    aria-hidden="true"
+                >
+            </button>
+
+
+            <!--
+                The application menu controls the rest of the
+                application. The account button is intentionally
+                separate.
+            -->
+            <div
+                id="ribbonCenter"
+                class="ribbon-center"
+            >
+                <!-- Populated by shell/ribbon.js -->
+            </div>
+
+
+            <div
+                id="ribbonRight"
+                class="ribbon-right"
+            >
+
+                <!-- Application menu -->
+                <button
+                    id="menuButton"
+                    class="ribbon-button"
+                    type="button"
+                    title="Menu"
+                    aria-label="Menu"
+                    aria-expanded="false"
+                >
+                    <img
+                        src="./assets/icons/ui/menu.svg"
+                        alt=""
+                        aria-hidden="true"
+                    >
+                </button>
+
+
+                <!-- Account only -->
+                <button
+                    id="accountButton"
+                    class="ribbon-button account-button"
+                    type="button"
+                    title="Account"
+                    aria-label="Account"
+                    aria-expanded="false"
+                >
+                    <img
+                        src="./assets/icons/ui/account.svg"
+                        alt=""
+                        aria-hidden="true"
+                    >
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             APPLICATION BODY
+        ================================================== -->
+
+        <main
+            id="appMain"
+            class="app-main"
+        >
+
+            <!-- =============================================
+                 HOME VIEW
+
+                 Empty containers are intentional.
+                 Subjects and notebooks are user-created.
+            ============================================== -->
+
+            <section
+                id="homeView"
+                class="view home-view"
+                aria-labelledby="homeTitle"
+            >
+
+                <div
+                    id="homeHeader"
+                    class="view-header"
+                >
+
+                    <div>
+                        <h1 id="homeTitle">
+                            everyLearnNotebook
+                        </h1>
+
+                        <p id="homeSubtitle">
+                            Your learning workspace.
+                        </p>
+                    </div>
+
+
+                    <div
+                        id="homeHeaderActions"
+                        class="view-header-actions"
+                    >
+                        <!-- Populated by home.js -->
+                    </div>
+
+                </div>
+
+
+                <!-- Subject section -->
+
+                <section
+                    id="subjectsSection"
+                    class="home-section"
+                    aria-labelledby="subjectsHeading"
+                >
+
+                    <div class="section-header">
+
+                        <div>
+                            <h2 id="subjectsHeading">
+                                Subjects
+                            </h2>
+
+                            <p
+                                id="subjectsDescription"
+                                class="section-description"
+                            >
+                                Create subjects or choose from the predefined subjects.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="subjectGrid"
+                        class="card-grid subject-grid"
+                    >
+
+                        <!--
+                            create-subject-card.js renders the
+                            blank "＋ New Subject" card here.
+                            User-created subject cards follow it.
+                        -->
+
+                    </div>
+
+                </section>
+
+
+                <!-- Notebook section -->
+
+                <section
+                    id="notebooksSection"
+                    class="home-section"
+                    aria-labelledby="notebooksHeading"
+                >
+
+                    <div class="section-header">
+
+                        <div>
+                            <h2 id="notebooksHeading">
+                                Notebooks
+                            </h2>
+
+                            <p
+                                id="notebooksDescription"
+                                class="section-description"
+                            >
+                                Create notebooks with an optional subject.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="notebookGrid"
+                        class="card-grid notebook-grid"
+                    >
+
+                        <!--
+                            create-notebook-card.js renders the
+                            blank "＋ New Notebook" card here.
+                        -->
+
+                    </div>
+
+                </section>
+
+            </section>
+
+
+            <!-- =============================================
+                 WORKSPACE VIEW
+
+                 The entire learning hierarchy lives here:
+                 Notebook → Section → Chapter → Topic.
+            ============================================== -->
+
+            <section
+                id="workspaceView"
+                class="view workspace-view hidden"
+                aria-label="Notebook workspace"
+            >
+
+                <div
+                    id="workspaceLayout"
+                    class="workspace-layout"
+                >
+
+                    <!-- Sidebar -->
+
+                    <aside
+                        id="workspaceSidebar"
+                        class="workspace-sidebar"
+                        aria-label="Notebook navigation"
+                    >
+
+                        <div
+                            id="workspaceSidebarHeader"
+                            class="sidebar-header"
+                        >
+                            <!-- Populated by sidebar.js -->
+                        </div>
+
+
+                        <nav
+                            id="hierarchyTree"
+                            class="hierarchy-tree"
+                            aria-label="Notebook hierarchy"
+                        >
+                            <!-- Populated by hierarchy-tree.js -->
+                        </nav>
+
+                    </aside>
+
+
+                    <!-- Main content -->
+
+                    <section
+                        id="workspaceContent"
+                        class="workspace-content"
+                    >
+
+                        <!-- Breadcrumb -->
+
+                        <div
+                            id="breadcrumb"
+                            class="breadcrumb"
+                            aria-label="Current location"
+                        >
+                            <!-- Populated by breadcrumb.js -->
+                        </div>
+
+
+                        <!-- Current topic header -->
+
+                        <div
+                            id="workspaceHeader"
+                            class="workspace-header"
+                        >
+
+                            <div
+                                id="workspaceTitleArea"
+                                class="workspace-title-area"
+                            >
+                                <!-- Populated by workspace.js -->
+                            </div>
+
+
+                            <div
+                                id="workspaceActions"
+                                class="workspace-actions"
+                            >
+                                <!-- Populated by workspace.js -->
+                            </div>
+
+                        </div>
+
+
+                        <!-- Content tabs -->
+
+                        <div
+                            id="contentTabs"
+                            class="content-tabs"
+                            role="tablist"
+                            aria-label="Topic content"
+                        >
+
+                            <button
+                                id="notesTab"
+                                class="content-tab active"
+                                type="button"
+                                role="tab"
+                                aria-selected="true"
+                                data-content-tab="notes"
+                            >
+                                Notes
+                            </button>
+
+
+                            <button
+                                id="questionsTab"
+                                class="content-tab"
+                                type="button"
+                                role="tab"
+                                aria-selected="false"
+                                data-content-tab="questions"
+                            >
+                                Interactive Questions
+                            </button>
+
+                        </div>
+
+
+                        <!-- Notes content -->
+
+                        <section
+                            id="notesContent"
+                            class="content-panel"
+                            role="tabpanel"
+                            aria-labelledby="notesTab"
+                        >
+
+                            <div
+                                id="notesToolbar"
+                                class="notes-toolbar"
+                            >
+                                <!-- Populated by notes-toolbar.js -->
+                            </div>
+
+
+                            <div
+                                id="notesEditor"
+                                class="notes-editor"
+                                contenteditable="true"
+                                spellcheck="true"
+                                aria-label="Notes editor"
+                            >
+                                <!-- User notes are rendered here -->
+                            </div>
+
+
+                            <div
+                                id="notesFooter"
+                                class="notes-footer"
+                            >
+                                <!-- Save controls are rendered here -->
+                            </div>
+
+                        </section>
+
+
+                        <!-- Interactive questions content -->
+
+                        <section
+                            id="questionsContent"
+                            class="content-panel hidden"
+                            role="tabpanel"
+                            aria-labelledby="questionsTab"
+                            hidden
+                        >
+
+                            <div
+                                id="questionModeTabs"
+                                class="question-mode-tabs"
+                                role="tablist"
+                                aria-label="Question mode"
+                            >
+
+                                <button
+                                    id="manageQuestionsTab"
+                                    class="question-mode-tab active"
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="true"
+                                    data-question-mode="manage"
+                                >
+                                    Manage Questions
+                                </button>
+
+
+                                <button
+                                    id="practiceQuestionsTab"
+                                    class="question-mode-tab"
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="false"
+                                    data-question-mode="practice"
+                                >
+                                    Practice
+                                </button>
+
+                            </div>
+
+
+                            <!-- Question manager -->
+
+                            <section
+                                id="questionManager"
+                                class="question-mode-panel"
+                                data-mode-panel="manage"
+                            >
+
+                                <div
+                                    id="questionManagerLayout"
+                                    class="question-manager-layout"
+                                >
+
+                                    <aside
+                                        id="questionListPanel"
+                                        class="question-list-panel"
+                                        aria-label="Question list"
+                                    >
+                                        <!-- Populated by question-manager.js -->
+                                    </aside>
+
+
+                                    <section
+                                        id="questionEditorPanel"
+                                        class="question-editor-panel"
+                                        aria-label="Question editor"
+                                    >
+                                        <!--
+                                            The question editor loads
+                                            exactly one question type at
+                                            a time.
+                                        -->
+                                    </section>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- Practice -->
+
+                            <section
+                                id="practiceMode"
+                                class="question-mode-panel hidden"
+                                data-mode-panel="practice"
+                                hidden
+                            >
+
+                                <div
+                                    id="practiceHeader"
+                                    class="practice-header"
+                                >
+                                    <!-- Populated by practice.js -->
+                                </div>
+
+
+                                <div
+                                    id="practiceContent"
+                                    class="practice-content"
+                                >
+                                    <!-- Populated by practice-renderer.js -->
+                                </div>
+
+                            </section>
+
+                        </section>
+
+                    </section>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- =================================================
+             GLOBAL OVERLAYS
+        ================================================== -->
+
+        <!-- Application menu -->
+        <div
+            id="applicationMenu"
+            class="application-menu hidden"
+            role="menu"
+            aria-hidden="true"
+        >
+            <!-- Populated by shell/menu.js -->
+        </div>
+
+
+        <!-- Account menu -->
+        <div
+            id="accountMenu"
+            class="account-menu hidden"
+            role="menu"
+            aria-hidden="true"
+        >
+            <!-- Populated by shell/account.js -->
+        </div>
+
+
+        <!-- Inline / application dialogs -->
+        <div
+            id="dialogHost"
+            class="dialog-host"
+        >
+            <!-- Populated by dialogs.js / confirmations.js -->
+        </div>
+
+
+        <!-- Toast notifications -->
+        <div
+            id="toastHost"
+            class="toast-host"
+            aria-live="polite"
+            aria-atomic="true"
+        >
+            <!-- Populated by toast.js -->
+        </div>
+
+
+        <!-- Search overlay -->
+        <div
+            id="searchHost"
+            class="search-host"
+        >
+            <!-- Populated when global search is opened -->
+        </div>
+
+    </div>
+
+    <script src="./js/app.js"></script>
+
+</body>
+</html>

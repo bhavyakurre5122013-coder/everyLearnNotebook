@@ -1,0 +1,204 @@
+/*
+=============================================================
+everyLearn — Layout
+-------------------------------------------------------------
+Purpose:
+    Ribbon, home, workspace, sidebar and major content layout.
+=============================================================
+*/
+
+.app-ribbon {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-ribbon);
+
+    height: var(--ribbon-height);
+
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-7);
+
+    padding-inline: var(--space-7);
+
+    background: color-mix(
+        in srgb,
+        var(--color-surface) 94%,
+        transparent
+    );
+
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(18px);
+}
+
+.ribbon-center {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ribbon-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ribbon-button {
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+
+    display: grid;
+    place-items: center;
+
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    background: transparent;
+
+    transition:
+        background-color var(--duration-fast) var(--ease-standard),
+        transform var(--duration-fast) var(--ease-standard);
+}
+
+.ribbon-button:hover {
+    background: var(--color-surface-soft);
+    transform: translateY(-1px);
+}
+
+.ribbon-button img,
+.ribbon-button svg {
+    width: 19px;
+    height: 19px;
+}
+
+.account-button {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-soft);
+}
+
+.home-view {
+    display: block;
+}
+
+.workspace-view {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.workspace-layout {
+    min-height: calc(100vh - var(--ribbon-height));
+    display: grid;
+    grid-template-columns:
+        var(--workspace-sidebar-width)
+        minmax(0, 1fr);
+}
+
+.workspace-sidebar {
+    position: sticky;
+    top: var(--ribbon-height);
+
+    height: calc(100vh - var(--ribbon-height));
+    overflow-y: auto;
+
+    padding: var(--space-7);
+
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+}
+
+.workspace-content {
+    min-width: 0;
+    padding: var(--space-10);
+}
+
+.workspace-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-8);
+
+    margin-bottom: var(--space-7);
+}
+
+.workspace-title-area,
+.workspace-actions {
+    min-width: 0;
+}
+
+.workspace-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+.content-tabs {
+    display: flex;
+    width: max-content;
+    gap: var(--space-1);
+
+    padding: var(--space-1);
+    margin-bottom: var(--space-7);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+}
+
+.content-tab,
+.question-mode-tab {
+    padding: var(--space-4) var(--space-6);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-secondary);
+    background: transparent;
+
+    transition:
+        color var(--duration-fast) var(--ease-standard),
+        background-color var(--duration-fast) var(--ease-standard);
+}
+
+.content-tab:hover,
+.question-mode-tab:hover {
+    color: var(--color-text);
+}
+
+.content-tab.active,
+.question-mode-tab.active {
+    color: var(--color-text);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-xs);
+}
+
+.content-panel {
+    min-width: 0;
+}
+
+.notes-content,
+.questions-content {
+    min-width: 0;
+}
+
+.question-mode-tabs {
+    display: flex;
+    width: max-content;
+    gap: var(--space-1);
+
+    padding: var(--space-1);
+    margin-bottom: var(--space-7);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+}
+
+.question-manager-layout {
+    display: grid;
+    grid-template-columns: var(--question-list-width) minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: start;
+}

@@ -1,0 +1,468 @@
+/*
+=============================================================
+everyLearn — Design Tokens
+-------------------------------------------------------------
+Purpose:
+    Centralized visual variables for the whole application.
+
+Rules:
+    • Feature CSS should reference these variables.
+    • Do not hard-code theme colors repeatedly elsewhere.
+    • Light and dark themes are both defined here.
+=============================================================
+*/
+
+:root {
+
+    /* -------------------------------------------------------
+       Base surfaces
+    ------------------------------------------------------- */
+
+    --color-background: #F4F8FA;
+    --color-surface: #FFFFFF;
+    --color-surface-soft: #FAFCFD;
+    --color-surface-raised: #FFFFFF;
+
+    /* -------------------------------------------------------
+       Text
+    ------------------------------------------------------- */
+
+    --color-text: #172033;
+    --color-text-secondary: #5B667A;
+    --color-text-tertiary: #7B8798;
+    --color-text-disabled: #A6AFBC;
+    --color-text-on-accent: #FFFFFF;
+
+    /* -------------------------------------------------------
+       Borders
+    ------------------------------------------------------- */
+
+    --color-border: #D8E1EA;
+    --color-border-light: #E8EEF3;
+    --color-border-strong: #C2CDD8;
+
+    /* -------------------------------------------------------
+       Primary / blue
+    ------------------------------------------------------- */
+
+    --color-primary: #2563EB;
+    --color-primary-hover: #1D4ED8;
+    --color-primary-active: #1E40AF;
+    --color-primary-soft: #E8F1FF;
+    --color-primary-border: #BFD5FF;
+
+    /* -------------------------------------------------------
+       Green
+    ------------------------------------------------------- */
+
+    --color-success: #16A34A;
+    --color-success-hover: #15803D;
+    --color-success-soft: #EAF7EE;
+    --color-success-border: #BDE5C8;
+
+    /* -------------------------------------------------------
+       Yellow
+       Used for edit actions.
+    ------------------------------------------------------- */
+
+    --color-edit: #D4A000;
+    --color-edit-hover: #B88900;
+    --color-edit-soft: #FFF7D6;
+    --color-edit-border: #F0D774;
+
+    /* -------------------------------------------------------
+       Red
+       Used for delete/destructive actions.
+    ------------------------------------------------------- */
+
+    --color-danger: #DC2626;
+    --color-danger-hover: #B91C1C;
+    --color-danger-soft: #FEECEC;
+    --color-danger-border: #F3B7B7;
+
+    /* -------------------------------------------------------
+       Purple
+    ------------------------------------------------------- */
+
+    --color-purple: #7C3AED;
+    --color-purple-soft: #F0EAFE;
+    --color-purple-border: #D9C8FF;
+
+    /* -------------------------------------------------------
+       Orange
+    ------------------------------------------------------- */
+
+    --color-orange: #EA580C;
+    --color-orange-soft: #FFF1E9;
+    --color-orange-border: #F6C5A9;
+
+    /* -------------------------------------------------------
+       Pink
+    ------------------------------------------------------- */
+
+    --color-pink: #DB2777;
+    --color-pink-soft: #FDEBF4;
+    --color-pink-border: #F4B8D4;
+
+    /* -------------------------------------------------------
+       Cyan
+    ------------------------------------------------------- */
+
+    --color-cyan: #0891B2;
+    --color-cyan-soft: #E8F9FC;
+    --color-cyan-border: #B8E9F1;
+
+    /* -------------------------------------------------------
+       Gold
+       Useful for importance stars.
+    ------------------------------------------------------- */
+
+    --color-star: #000000;
+    --color-star-empty: #B8BEC7;
+
+    /* -------------------------------------------------------
+       Favorite / heart
+       Standard monochrome treatment rather than emoji color.
+    ------------------------------------------------------- */
+
+    --color-favorite: #000000;
+    --color-favorite-empty: #6B7280;
+
+    /* -------------------------------------------------------
+       Bookmark
+       Standard monochrome treatment.
+    ------------------------------------------------------- */
+
+    --color-bookmark: #000000;
+    --color-bookmark-empty: #6B7280;
+
+    /* -------------------------------------------------------
+       Shadows
+    ------------------------------------------------------- */
+
+    --shadow-xs:
+        0 1px 3px rgba(23, 32, 51, 0.05);
+
+    --shadow-sm:
+        0 4px 12px rgba(23, 32, 51, 0.06);
+
+    --shadow-md:
+        0 10px 30px rgba(23, 32, 51, 0.08);
+
+    --shadow-lg:
+        0 18px 46px rgba(23, 32, 51, 0.14);
+
+    --shadow-focus:
+        0 0 0 3px rgba(37, 99, 235, 0.14);
+
+    /* -------------------------------------------------------
+       Radius
+    ------------------------------------------------------- */
+
+    --radius-xs: 6px;
+    --radius-sm: 9px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 18px;
+    --radius-2xl: 22px;
+    --radius-round: 999px;
+
+    /* -------------------------------------------------------
+       Spacing scale
+    ------------------------------------------------------- */
+
+    --space-1: 4px;
+    --space-2: 6px;
+    --space-3: 8px;
+    --space-4: 10px;
+    --space-5: 12px;
+    --space-6: 14px;
+    --space-7: 16px;
+    --space-8: 18px;
+    --space-9: 20px;
+    --space-10: 24px;
+    --space-11: 28px;
+    --space-12: 32px;
+    --space-13: 36px;
+    --space-14: 40px;
+    --space-15: 48px;
+    --space-16: 60px;
+
+    /* -------------------------------------------------------
+       Typography
+    ------------------------------------------------------- */
+
+    --font-family-ui:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    --font-family-reading:
+        "Cambria Math",
+        "Cambria",
+        "Times New Roman",
+        serif;
+
+    --font-size-xs: 11px;
+    --font-size-sm: 12px;
+    --font-size-md: 13px;
+    --font-size-base: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 20px;
+    --font-size-3xl: 24px;
+    --font-size-4xl: 29px;
+    --font-size-display: 42px;
+
+    --line-height-tight: 1.15;
+    --line-height-normal: 1.45;
+    --line-height-relaxed: 1.65;
+    --line-height-reading: 1.75;
+
+    /* -------------------------------------------------------
+       Component sizes
+    ------------------------------------------------------- */
+
+    --ribbon-height: 64px;
+    --control-height: 40px;
+    --control-height-small: 34px;
+    --icon-button-size: 40px;
+
+    /* -------------------------------------------------------
+       Layout
+    ------------------------------------------------------- */
+
+    --page-width: 1440px;
+    --page-padding: 24px;
+    --workspace-sidebar-width: 300px;
+    --question-list-width: 320px;
+
+    /* -------------------------------------------------------
+       Motion
+    ------------------------------------------------------- */
+
+    --duration-fast: 120ms;
+    --duration-normal: 180ms;
+    --duration-slow: 240ms;
+
+    --ease-standard:
+        cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* -------------------------------------------------------
+       Z-index
+    ------------------------------------------------------- */
+
+    --z-base: 0;
+    --z-ribbon: 100;
+    --z-sidebar: 120;
+    --z-popover: 200;
+    --z-dialog: 300;
+    --z-toast: 400;
+}
+
+
+/*
+=============================================================
+Dark theme
+=============================================================
+*/
+
+[data-theme="dark"] {
+
+    /* -------------------------------------------------------
+       Base surfaces
+    ------------------------------------------------------- */
+
+    --color-background: #11141A;
+    --color-surface: #191D24;
+    --color-surface-soft: #20252D;
+    --color-surface-raised: #222831;
+
+    /* -------------------------------------------------------
+       Text
+    ------------------------------------------------------- */
+
+    --color-text: #F5F7FA;
+    --color-text-secondary: #A7AFBD;
+    --color-text-tertiary: #8792A3;
+    --color-text-disabled: #5F6978;
+    --color-text-on-accent: #FFFFFF;
+
+    /* -------------------------------------------------------
+       Borders
+    ------------------------------------------------------- */
+
+    --color-border: #343C47;
+    --color-border-light: #2A313B;
+    --color-border-strong: #4A5562;
+
+    /* -------------------------------------------------------
+       Primary
+    ------------------------------------------------------- */
+
+    --color-primary: #79B8FF;
+    --color-primary-hover: #A7CEFF;
+    --color-primary-active: #C9E1FF;
+    --color-primary-soft: rgba(96, 165, 250, 0.14);
+    --color-primary-border: rgba(96, 165, 250, 0.35);
+
+    /* -------------------------------------------------------
+       Success
+    ------------------------------------------------------- */
+
+    --color-success: #5FDF8B;
+    --color-success-hover: #82E7A4;
+    --color-success-soft: rgba(74, 222, 128, 0.13);
+    --color-success-border: rgba(74, 222, 128, 0.28);
+
+    /* -------------------------------------------------------
+       Edit
+    ------------------------------------------------------- */
+
+    --color-edit: #E8C34A;
+    --color-edit-hover: #F3D46D;
+    --color-edit-soft: rgba(250, 204, 21, 0.13);
+    --color-edit-border: rgba(250, 204, 21, 0.30);
+
+    /* -------------------------------------------------------
+       Danger
+    ------------------------------------------------------- */
+
+    --color-danger: #F47A7A;
+    --color-danger-hover: #FF9E9E;
+    --color-danger-soft: rgba(248, 113, 113, 0.12);
+    --color-danger-border: rgba(248, 113, 113, 0.30);
+
+    /* -------------------------------------------------------
+       Supporting colors
+    ------------------------------------------------------- */
+
+    --color-purple: #B29AF4;
+    --color-purple-soft: rgba(167, 139, 250, 0.14);
+    --color-purple-border: rgba(167, 139, 250, 0.30);
+
+    --color-orange: #F3A56B;
+    --color-orange-soft: rgba(251, 146, 60, 0.13);
+    --color-orange-border: rgba(251, 146, 60, 0.30);
+
+    --color-pink: #EF8CC0;
+    --color-pink-soft: rgba(244, 114, 182, 0.13);
+    --color-pink-border: rgba(244, 114, 182, 0.30);
+
+    --color-cyan: #58D4E4;
+    --color-cyan-soft: rgba(34, 211, 238, 0.12);
+    --color-cyan-border: rgba(34, 211, 238, 0.28);
+
+    /* -------------------------------------------------------
+       Monochrome markers
+    ------------------------------------------------------- */
+
+    --color-star: #FFFFFF;
+    --color-star-empty: #7F8997;
+
+    --color-favorite: #FFFFFF;
+    --color-favorite-empty: #8994A2;
+
+    --color-bookmark: #FFFFFF;
+    --color-bookmark-empty: #8994A2;
+
+    /* -------------------------------------------------------
+       Dark shadows
+    ------------------------------------------------------- */
+
+    --shadow-xs:
+        0 1px 3px rgba(0, 0, 0, 0.18);
+
+    --shadow-sm:
+        0 4px 12px rgba(0, 0, 0, 0.20);
+
+    --shadow-md:
+        0 10px 30px rgba(0, 0, 0, 0.20);
+
+    --shadow-lg:
+        0 18px 46px rgba(0, 0, 0, 0.32);
+
+    --shadow-focus:
+        0 0 0 3px rgba(96, 165, 250, 0.16);
+}
+
+
+/*
+=============================================================
+Semantic action colors
+-------------------------------------------------------------
+These variables let shared button components maintain one
+consistent visual language throughout every feature.
+
+CREATE = blue + white plus
+EDIT   = yellow + white pencil
+DELETE = red + white trash
+SAVE   = green + white bookmark
+=============================================================
+*/
+
+:root {
+
+    --action-create-background: var(--color-primary);
+    --action-create-hover: var(--color-primary-hover);
+    --action-create-foreground: #FFFFFF;
+
+    --action-edit-background: var(--color-edit);
+    --action-edit-hover: var(--color-edit-hover);
+    --action-edit-foreground: #FFFFFF;
+
+    --action-delete-background: var(--color-danger);
+    --action-delete-hover: var(--color-danger-hover);
+    --action-delete-foreground: #FFFFFF;
+
+    --action-save-background: var(--color-success);
+    --action-save-hover: var(--color-success-hover);
+    --action-save-foreground: #FFFFFF;
+}
+
+
+/*
+=============================================================
+Subject palette
+-------------------------------------------------------------
+Predefined subjects may use these colors as their defaults.
+Users may override a notebook color independently.
+=============================================================
+*/
+
+:root {
+
+    --subject-mathematics: #2563EB;
+    --subject-science: #16A34A;
+    --subject-physics: #7C3AED;
+    --subject-chemistry: #0891B2;
+    --subject-biology: #059669;
+    --subject-astronomy: #4F46E5;
+    --subject-social: #EA580C;
+    --subject-history: #B45309;
+    --subject-geography: #0F766E;
+    --subject-civics: #DB2777;
+    --subject-economics: #CA8A04;
+    --subject-computer-science: #4F46E5;
+    --subject-programming: #9333EA;
+    --subject-english: #BE185D;
+}
+
+
+/*
+=============================================================
+Question limits
+-------------------------------------------------------------
+These values are the logical UI limits. They should be read by
+JavaScript through CSS only when useful; the actual data rules
+belong in js/core/constants.js.
+=============================================================
+*/
+
+:root {
+
+    --question-hint-max: 4;
+    --subpart-hint-max: 2;
+    --importance-max: 3;
+
+}
