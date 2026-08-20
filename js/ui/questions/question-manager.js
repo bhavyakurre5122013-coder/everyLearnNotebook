@@ -33,12 +33,10 @@ function renderQuestionManager() {
                     </p>
                 </div>
 
-                <button
-                    class="create-button small-button"
-                    data-new-question
-                >
-                    ＋ New
-                </button>
+                <div class="question-list-header-actions">
+                    <button class="secondary-button small-button" data-checking-settings type="button">⚙ Checking</button>
+                    <button class="create-button small-button" data-new-question>＋ New</button>
+                </div>
             </div>
         </div>
 
@@ -60,6 +58,10 @@ function renderQuestionManager() {
             }
         </div>
     `;
+
+    panel.querySelector("[data-checking-settings]")?.addEventListener("click", () => {
+        document.dispatchEvent(new Event("everylearn:checking-settings"));
+    });
 
     panel.querySelector(
         "[data-new-question]"
@@ -97,62 +99,24 @@ function renderQuestionManager() {
 }
 
 function renderItem(question, index) {
+    const title = question.text || label(question.type);
     return `
-        <button
-            class="question-list-item ${
-                question.id ===
-                state.editingQuestionId
-                    ? "active"
-                    : ""
-            }"
-            data-question-id="${question.id}"
-            type="button"
-        >
-            <div class="question-list-index">
-                Question ${index + 1}
+        <div class="question-list-item ${question.id === state.editingQuestionId ? "active" : ""}">
+            <button class="question-list-select" data-question-id="${question.id}" type="button">
+                <div class="question-list-index">Question ${index + 1}</div>
+                <div class="question-list-title">${escapeHTML(title)}</div>
+                <div class="question-list-meta">
+                    <span class="chip">${escapeHTML(label(question.type))}</span>
+                    ${question.important ? `<span class="chip">${"★".repeat(question.important)}</span>` : ""}
+                    ${question.favorite ? `<span class="chip"><img class="marker-icon" src="./assets/icons/ui/favorite-filled.svg" alt=""> Favorite</span>` : ""}
+                    ${question.bookmarked ? `<span class="chip"><img class="marker-icon" src="./assets/icons/ui/bookmark-filled.svg" alt=""> Bookmark</span>` : ""}
+                    ${question.notes ? `<span class="chip"><img class="marker-icon" src="./assets/icons/ui/notes.svg" alt=""> Notes</span>` : ""}
+                </div>
+            </button>
+            <div class="question-list-item-actions">
+                ${ns.renderItemActionMenu("question", question.id, { label: title })}
             </div>
-
-            <div class="question-list-title">
-                ${
-                    escapeHTML(
-                        question.text ||
-                        label(question.type)
-                    )
-                }
-            </div>
-
-            <div class="question-list-meta">
-                <span class="chip">
-                    ${escapeHTML(
-                        label(question.type)
-                    )}
-                </span>
-
-                ${
-                    question.important
-                        ? `
-                            <span class="chip">
-                                ${"★".repeat(
-                                    question.important
-                                )}
-                            </span>
-                        `
-                        : ""
-                }
-
-                ${
-                    question.favorite
-                        ? `<span class="chip"><img class="marker-icon" src="./assets/icons/ui/favorite-filled.svg" alt=""> Favorite</span>`
-                        : ""
-                }
-
-                ${
-                    question.bookmarked
-                        ? `<span class="chip"><img class="marker-icon" src="./assets/icons/ui/bookmark-filled.svg" alt=""> Bookmark</span>`
-                        : ""
-                }
-            </div>
-        </button>
+        </div>
     `;
 }
 

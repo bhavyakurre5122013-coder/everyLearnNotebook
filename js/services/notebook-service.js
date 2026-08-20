@@ -3,6 +3,7 @@
     const state = ns.state;
     const saveStoredData = (...args) => ns.saveStoredData(...args);
     const createNotebook = (...args) => ns.createNotebook(...args);
+    const createId = (...args) => ns.createId(...args);
 /* everyLearn — Notebook Service */
 
 
@@ -54,6 +55,45 @@ function deleteNotebook(id) {
     saveStoredData(state.data);
 }
 
+
+function cloneNotebook(notebook, name) {
+    const clone = structuredClone(notebook);
+    const fresh = value => {
+        if (Array.isArray(value)) return value.map(fresh);
+        if (!value || typeof value !== "object") return value;
+        const out = {};
+        for (const [key, item] of Object.entries(value)) {
+            out[key] = key === "id" && typeof item === "string"
+                ? createId(item.split("_")[0] || "id")
+                : fresh(item);
+        }
+        return out;
+    };
+    const result = fresh(clone);
+    result.name = String(name || `${notebook.name} Copy`).trim();
+    result.updatedAt = Date.now();
+    return result;
+}
+
+function duplicateNotebook(id, name, subjectId = null) {
+    const source = getNotebook(id);
+    if (!source) throw new Error("Notebook not found.");
+    const copy = cloneNotebook(source, name);
+    copy.subjectId = subjectId ?? source.subjectId ?? null;
+    state.data.notebooks.push(copy);
+    saveStoredData(state.data);
+    return copy;
+}
+
+function moveNotebook(id, subjectId) {
+    const notebook = getNotebook(id);
+    if (!notebook) throw new Error("Notebook not found.");
+    notebook.subjectId = subjectId || null;
+    notebook.updatedAt = Date.now();
+    saveStoredData(state.data);
+    return notebook;
+}
+
 function touchNotebook(id) {
     const notebook = getNotebook(id);
     if (notebook) {
@@ -69,4 +109,6 @@ function touchNotebook(id) {
     ns.updateNotebook = updateNotebook;
     ns.deleteNotebook = deleteNotebook;
     ns.touchNotebook = touchNotebook;
+    ns.duplicateNotebook = duplicateNotebook;
+    ns.moveNotebook = moveNotebook;
 })(window.everyLearn);

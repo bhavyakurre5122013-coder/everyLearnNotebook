@@ -4,6 +4,7 @@
     const saveStoredData = (...args) => ns.saveStoredData(...args);
     const createQuestion = (...args) => ns.createQuestion(...args);
     const getTopic = (...args) => ns.getTopic(...args);
+    const createId = (...args) => ns.createId(...args);
 /* everyLearn — Question Service */
 
 
@@ -78,6 +79,52 @@ function duplicateQuestion(notebookId, topicId, questionId) {
     return copy;
 }
 
+
+function cloneQuestion(question) {
+    const copy = structuredClone(question);
+    const fresh = value => {
+        if (Array.isArray(value)) return value.map(fresh);
+        if (!value || typeof value !== "object") return value;
+        const result = {};
+        for (const [key, item] of Object.entries(value)) {
+            result[key] = key === "id" && typeof item === "string"
+                ? createId(item.split("_")[0] || "id")
+                : fresh(item);
+        }
+        return result;
+    };
+    const result = fresh(copy);
+    result.attempts = 0;
+    result.correct = 0;
+    result.lastPractice = null;
+    return result;
+}
+
+function moveQuestion(sourceNotebookId, sourceTopicId, questionId, destinationNotebookId, destinationTopicId) {
+    const sourceTopic = getTopic(sourceNotebookId, sourceTopicId);
+    const destinationTopic = getTopic(destinationNotebookId, destinationTopicId);
+    if (!sourceTopic) throw new Error("Source topic not found.");
+    if (!destinationTopic) throw new Error("Destination topic not found.");
+    const index = sourceTopic.questions.findIndex(question => question.id === questionId);
+    if (index < 0) throw new Error("Question not found.");
+    const [question] = sourceTopic.questions.splice(index, 1);
+    destinationTopic.questions.push(question);
+    saveStoredData(state.data);
+    return question;
+}
+
+function duplicateQuestionToTopic(sourceNotebookId, sourceTopicId, questionId, destinationNotebookId, destinationTopicId, name) {
+    const original = getQuestion(sourceNotebookId, sourceTopicId, questionId);
+    const destinationTopic = getTopic(destinationNotebookId, destinationTopicId);
+    if (!original) throw new Error("Question not found.");
+    if (!destinationTopic) throw new Error("Destination topic not found.");
+    const copy = cloneQuestion(original);
+    if (name) copy.text = String(name).trim();
+    destinationTopic.questions.push(copy);
+    saveStoredData(state.data);
+    return copy;
+}
+
 function setQuestionBookmark(notebookId, topicId, id, value) {
     return updateQuestion(
         notebookId, topicId, id, { bookmarked: Boolean(value) }
@@ -136,6 +183,8 @@ function removeQuestionHint(
     ns.addQuestion = addQuestion;
     ns.updateQuestion = updateQuestion;
     ns.deleteQuestion = deleteQuestion;
+    ns.moveQuestion = moveQuestion;
+    ns.duplicateQuestionToTopic = duplicateQuestionToTopic;
     ns.duplicateQuestion = duplicateQuestion;
     ns.setQuestionBookmark = setQuestionBookmark;
     ns.setQuestionFavorite = setQuestionFavorite;

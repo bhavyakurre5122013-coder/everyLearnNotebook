@@ -1,16 +1,19 @@
 (function(ns){
     "use strict";
     const state = ns.state;
+    const ROUTES = ns.ROUTES;
     const isHome = (...args) => ns.isHome(...args);
     const openWorkspace = (...args) => ns.openWorkspace(...args);
+    const openSubjectsPage = (...args) => ns.openSubjectsPage(...args);
+    const openNotebooksPage = (...args) => ns.openNotebooksPage(...args);
+    const openSubjectPage = (...args) => ns.openSubjectPage(...args);
+    const goHome = (...args) => ns.goHome(...args);
     const listSubjects = (...args) => ns.listSubjects(...args);
     const createSubject = (...args) => ns.createSubject(...args);
     const updateSubject = (...args) => ns.updateSubject(...args);
     const deleteSubject = (...args) => ns.deleteSubject(...args);
     const listNotebooks = (...args) => ns.listNotebooks(...args);
     const createNotebookRecord = (...args) => ns.createNotebookRecord(...args);
-    const updateNotebook = (...args) => ns.updateNotebook(...args);
-    const deleteNotebook = (...args) => ns.deleteNotebook(...args);
     const renderSubjectGrid = (...args) => ns.renderSubjectGrid(...args);
     const renderNotebookGrid = (...args) => ns.renderNotebookGrid(...args);
     const renderCreateSubjectCard = (...args) => ns.renderCreateSubjectCard(...args);
@@ -22,338 +25,179 @@
     const showToast = (...args) => ns.showToast(...args);
 /*
 =============================================================
-everyLearn — Home Shell
+everyLearn — Home / Library Pages
 =============================================================
 */
 
+function isLibraryRoute() {
+    return [
+        ROUTES.HOME,
+        ROUTES.SUBJECTS,
+        ROUTES.NOTEBOOKS,
+        ROUTES.SUBJECT
+    ].includes(state.route);
+}
 
+function setSectionAction(sectionId, label, handler) {
+    const section = document.getElementById(sectionId);
+    const header = section?.querySelector('.section-header');
+    if (!header) return;
 
+    let actions = header.querySelector('[data-section-actions]');
+    if (!actions) {
+        actions = document.createElement('div');
+        actions.dataset.sectionActions = 'true';
+        actions.className = 'view-header-actions';
+        header.appendChild(actions);
+    }
 
+    actions.innerHTML = `
+        <button class="secondary-button small-button" type="button" data-section-link>
+            ${escapeHTML(label)}
+        </button>
+    `;
+    actions.querySelector('[data-section-link]').onclick = handler;
+}
 
-
-
-
-
-
-
-
-
-
+function clearSectionAction(sectionId) {
+    document.getElementById(sectionId)
+        ?.querySelector('[data-section-actions]')
+        ?.remove();
+}
 
 function initHome() {
-    document.getElementById("subjectGrid")
-        ?.addEventListener(
-            "click",
-            onSubjectClick
-        );
+    document.getElementById("subjectGrid")?.addEventListener("click", onSubjectClick);
+    document.getElementById("notebookGrid")?.addEventListener("click", onNotebookClick);
 
-    document.getElementById("notebookGrid")
-        ?.addEventListener(
-            "click",
-            onNotebookClick
-        );
-
-    document.addEventListener(
-        "everylearn:create-subject",
-        () => openSubjectEditor()
-    );
-
-    document.addEventListener(
-        "everylearn:create-notebook",
-        () => openNotebookEditor()
-    );
-
-    document.addEventListener(
-        "everylearn:open-notebook-editor",
-        event =>
-            openNotebookEditor(
-                event.detail?.subjectId || null
-            )
-    );
-
-    document.addEventListener(
-        "everylearn:edit-subject",
-        event =>
-            openSubjectEditor(
-                event.detail.subject
-            )
-    );
-
-    document.addEventListener(
-        "everylearn:delete-subject",
-        event =>
-            removeSubject(
-                event.detail.subjectId
-            )
-    );
+    document.addEventListener("everylearn:create-subject", () => openSubjectEditor());
+    document.addEventListener("everylearn:create-notebook", () => openNotebookEditor());
+    document.addEventListener("everylearn:open-notebook-editor", event => openNotebookEditor(event.detail?.subjectId || null));
+    document.addEventListener("everylearn:edit-subject", event => openSubjectEditor(event.detail.subject));
+    document.addEventListener("everylearn:delete-subject", event => removeSubject(event.detail.subjectId));
 }
 
 function renderHome() {
-    const view =
-        document.getElementById(
-            "homeView"
-        );
-
+    const view = document.getElementById("homeView");
     if (!view) return;
 
-    view.classList.toggle(
-        "hidden",
-        !isHome()
-    );
+    const active = isLibraryRoute();
+    view.classList.toggle("hidden", !active);
+    if (!active) return;
 
-    if (!isHome()) return;
+    const subjectsSection = document.getElementById("subjectsSection");
+    const notebooksSection = document.getElementById("notebooksSection");
+    const notebookHeading = document.getElementById("notebooksHeading");
+    const notebookDescription = document.getElementById("notebooksDescription");
+    const homeTitle = document.getElementById("homeTitle");
+    const homeSubtitle = document.getElementById("homeSubtitle");
+    const headerActions = document.getElementById("homeHeaderActions");
 
-    const filteredSubject =
-        state.homeSubjectFilterId
-            ? listSubjects().find(
-                subject =>
-                    subject.id ===
-                    state.homeSubjectFilterId
-            )
-            : null;
+    // Default header actions: no "New notebook" shortcut in the upper right.
+    headerActions.innerHTML = "";
 
-    const subjectsSection =
-        document.getElementById(
-            "subjectsSection"
-        );
+    const allSubjects = listSubjects();
+    const allNotebooks = listNotebooks();
 
-    const notebookHeading =
-        document.getElementById(
-            "notebooksHeading"
-        );
+    if (state.route === ROUTES.HOME) {
+        homeTitle.textContent = "everyLearnNotebook";
+        homeSubtitle.textContent = "Your learning workspace.";
+        subjectsSection?.classList.remove("hidden");
+        notebooksSection?.classList.remove("hidden");
+        notebookHeading.textContent = "Notebooks";
+        notebookDescription.textContent = "Create notebooks with an optional subject.";
 
-    const notebookDescription =
-        document.getElementById(
-            "notebooksDescription"
-        );
+        setSectionAction("subjectsSection", "View all subjects", () => {
+            openSubjectsPage();
+            document.dispatchEvent(new Event("everylearn:render"));
+        });
+        setSectionAction("notebooksSection", "View all notebooks", () => {
+            openNotebooksPage();
+            document.dispatchEvent(new Event("everylearn:render"));
+        });
 
-    const homeTitle =
-        document.getElementById(
-            "homeTitle"
-        );
-
-    const homeSubtitle =
-        document.getElementById(
-            "homeSubtitle"
-        );
-
-    const headerActions =
-        document.getElementById(
-            "homeHeaderActions"
-        );
-
-    if (filteredSubject) {
-        subjectsSection?.classList.add(
-            "hidden"
-        );
-
-        homeTitle.textContent =
-            filteredSubject.name;
-
-        homeSubtitle.textContent =
-            "Notebooks linked to this subject.";
-
-        notebookHeading.textContent =
-            "Notebooks";
-
-        notebookDescription.textContent =
-            `All notebooks under ${filteredSubject.name}.`;
-
-        headerActions.innerHTML = `
-            <button
-                class="secondary-button"
-                type="button"
-                data-subject-home
-            >
-                ← All subjects
-            </button>
-
-            <button
-                class="create-button"
-                type="button"
-                data-home-new-notebook
-            >
-                ＋ New notebook
-            </button>
-        `;
-
-        headerActions
-            .querySelector(
-                "[data-subject-home]"
-            )
-            .onclick = () => {
-                state.homeSubjectFilterId =
-                    null;
-
-                renderHome();
-            };
-
-        headerActions
-            .querySelector(
-                "[data-home-new-notebook]"
-            )
-            .onclick = () =>
-            document.dispatchEvent(
-                new Event(
-                    "everylearn:create-notebook"
-                )
-            );
-    } else {
-        subjectsSection?.classList.remove(
-            "hidden"
-        );
-
-        homeTitle.textContent =
-            "everyLearnNotebook";
-
-        homeSubtitle.textContent =
-            "Your learning workspace.";
-
-        notebookHeading.textContent =
-            "Notebooks";
-
-        notebookDescription.textContent =
-            "Create notebooks with an optional subject.";
-
-        headerActions.innerHTML = `
-            <button
-                class="create-button"
-                type="button"
-                data-home-new-notebook
-            >
-                ＋ New notebook
-            </button>
-        `;
-
-        headerActions
-            .querySelector(
-                "[data-home-new-notebook]"
-            )
-            .onclick = () =>
-            document.dispatchEvent(
-                new Event(
-                    "everylearn:create-notebook"
-                )
-            );
+        renderCreateSubjectCard();
+        renderCreateNotebookCard();
+        renderSubjectGrid(allSubjects);
+        renderNotebookGrid(allNotebooks);
+        return;
     }
 
-    renderCreateSubjectCard();
+    if (state.route === ROUTES.SUBJECTS) {
+        homeTitle.textContent = "All subjects";
+        homeSubtitle.textContent = "Every subject in your everyLearnNotebook.";
+        subjectsSection?.classList.remove("hidden");
+        notebooksSection?.classList.add("hidden");
+        clearSectionAction("subjectsSection");
+        renderCreateSubjectCard();
+        renderSubjectGrid(allSubjects);
+        return;
+    }
+
+    if (state.route === ROUTES.NOTEBOOKS) {
+        homeTitle.textContent = "All notebooks";
+        homeSubtitle.textContent = "Every notebook in your everyLearnNotebook.";
+        subjectsSection?.classList.add("hidden");
+        notebooksSection?.classList.remove("hidden");
+        notebookHeading.textContent = "Notebooks";
+        notebookDescription.textContent = "All notebooks across every subject.";
+        clearSectionAction("notebooksSection");
+        renderCreateNotebookCard();
+        renderNotebookGrid(allNotebooks);
+        return;
+    }
+
+    const subject = allSubjects.find(item => item.id === state.subjectPageId);
+    if (!subject) {
+        openSubjectsPage();
+        renderHome();
+        return;
+    }
+
+    homeTitle.textContent = subject.name;
+    homeSubtitle.textContent = "Subject page";
+    headerActions.innerHTML = `
+        <button class="secondary-button" type="button" data-subject-back>← All subjects</button>
+        ${ns.renderItemActionMenu("subject", subject.id, { label: subject.name })}
+    `;
+    headerActions.querySelector('[data-subject-back]').onclick = () => {
+        openSubjectsPage();
+        document.dispatchEvent(new Event("everylearn:render"));
+    };
+
+    subjectsSection?.classList.add("hidden");
+    notebooksSection?.classList.remove("hidden");
+    notebookHeading.textContent = "Notebooks";
+    notebookDescription.textContent = `Notebooks linked to ${subject.name}.`;
+    clearSectionAction("notebooksSection");
     renderCreateNotebookCard();
-
-    if (!filteredSubject) {
-        renderSubjectGrid(
-            listSubjects()
-        );
-    } else {
-        const subjectGrid =
-            document.getElementById(
-                "subjectGrid"
-            );
-
-        if (subjectGrid) {
-            subjectGrid.innerHTML = "";
-        }
-    }
-
-    const notebooks =
-        filteredSubject
-            ? listNotebooks().filter(
-                notebook =>
-                    notebook.subjectId ===
-                    filteredSubject.id
-            )
-            : listNotebooks();
-
-    renderNotebookGrid(
-        notebooks
-    );
+    renderNotebookGrid(allNotebooks.filter(notebook => notebook.subjectId === subject.id));
 }
 
 function onSubjectClick(event) {
-    const create =
-        event.target.closest(
-            "[data-create-subject]"
-        );
-
+    const create = event.target.closest("[data-create-subject]");
     if (create) {
         openSubjectEditor();
         return;
     }
 
-    const edit =
-        event.target.closest(
-            "[data-edit-subject]"
-        );
-
-    if (edit) {
-        event.stopPropagation();
-
-        const subject =
-            listSubjects().find(
-                item =>
-                    item.id ===
-                    edit.dataset.editSubject
-            );
-
-        if (subject) {
-            openSubjectEditor(subject);
-        }
-
-        return;
-    }
-
-    const del =
-        event.target.closest(
-            "[data-delete-subject]"
-        );
-
-    if (del) {
-        event.stopPropagation();
-        removeSubject(
-            del.dataset.deleteSubject
-        );
-        return;
-    }
-
-    const card =
-        event.target.closest(
-            "[data-subject-card]"
-        );
-
+    const card = event.target.closest("[data-subject-card]");
     if (card) {
-        state.homeSubjectFilterId =
-            card.dataset.subjectCard;
-
-        renderHome();
+        openSubjectPage(card.dataset.subjectCard);
+        document.dispatchEvent(new Event("everylearn:render"));
     }
 }
 
 function onNotebookClick(event) {
-    const create =
-        event.target.closest(
-            "[data-create-notebook]"
-        );
-
+    const create = event.target.closest("[data-create-notebook]");
     if (create) {
         openNotebookEditor();
         return;
     }
 
-    const card =
-        event.target.closest(
-            "[data-notebook-card]"
-        );
-
+    const card = event.target.closest("[data-notebook-card]");
     if (card) {
-        openWorkspace(
-            card.dataset.notebookCard
-        );
-
-        document.dispatchEvent(
-            new Event(
-                "everylearn:render"
-            )
-        );
+        openWorkspace(card.dataset.notebookCard);
+        document.dispatchEvent(new Event("everylearn:render"));
     }
 }
 
@@ -888,4 +732,5 @@ function escapeHTML(value) {
 
     ns.initHome = initHome;
     ns.renderHome = renderHome;
+    ns.openSubjectEditor = openSubjectEditor;
 })(window.everyLearn);

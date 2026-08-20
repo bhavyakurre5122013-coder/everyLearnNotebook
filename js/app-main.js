@@ -15,6 +15,7 @@
     const initBookmarks = ns.initBookmarks;
     const initQuestionFilters = ns.initQuestionFilters;
     const initPracticeSettings = ns.initPracticeSettings;
+    const initRichTextEditors = ns.initRichTextEditors;
     const showToast = (...args) => ns.showToast(...args);
     const renderHome = (...args) => ns.renderHome(...args);
     const renderWorkspace = (...args) => ns.renderWorkspace(...args);
@@ -41,6 +42,15 @@ everyLearnNotebook — Application Entry
 
 
 
+function ensureRichTextStylesheet() {
+    if (document.querySelector("link[data-rich-text-styles]")) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "./css/rich-text.css";
+    link.dataset.richTextStyles = "1";
+    document.head.appendChild(link);
+}
+
 function loadData() {
     const stored = loadStoredData();
     state.data = migrateData(
@@ -50,6 +60,9 @@ function loadData() {
     window.everyLearnState = state;
     window.everyLearnSubjects =
         state.data.subjects;
+
+    state.practice.answerDisplayMode =
+        state.data.settings.practice?.answerDisplayMode || "after-each";
 
     saveStoredData(state.data);
 }
@@ -78,6 +91,8 @@ async function init() {
     initWorkspace();
     initBookmarks();
     initQuestionFilters();
+    ensureRichTextStylesheet();
+    initRichTextEditors();
     initPracticeSettings();
 
     document.addEventListener(

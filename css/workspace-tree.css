@@ -362,3 +362,23 @@ everyLearnNotebook — Workspace Hierarchy
         display: none;
     }
 }
+
+.tree-item-wrap .item-action-menu,
+.tree-label .item-action-menu {
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.tree-item-wrap:hover .item-action-menu,
+.tree-label:hover .item-action-menu,
+.tree-item-wrap .item-action-menu.open,
+.tree-label .item-action-menu.open {
+    opacity: 1;
+}
+
+@media (max-width: 900px) {
+    .tree-item-wrap .item-action-menu,
+    .tree-label .item-action-menu {
+        opacity: 1;
+    }
+}

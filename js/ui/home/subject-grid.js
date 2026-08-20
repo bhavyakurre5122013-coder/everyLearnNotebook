@@ -14,10 +14,6 @@ function renderSubjectGrid(subjects) {
 
     grid.innerHTML = "";
 
-    if (createCard) {
-        grid.appendChild(createCard);
-    }
-
     for (const subject of subjects) {
         const card =
             document.createElement("article");
@@ -37,22 +33,7 @@ function renderSubjectGrid(subjects) {
 
         card.innerHTML = `
             <div class="card-actions">
-                <button
-                    class="edit-button small-button"
-                    data-edit-subject="${subject.id}"
-                    type="button"
-                >
-                    <img src="./assets/icons/ui/pencil.svg" alt=""> Edit
-                </button>
-
-                <button
-                    class="delete-button small-button"
-                    data-delete-subject="${subject.id}"
-                    type="button"
-                    aria-label="Delete subject"
-                >
-                    ×
-                </button>
+                ${ns.renderItemActionMenu("subject", subject.id, { label: subject.name })}
             </div>
 
             <div
@@ -82,6 +63,10 @@ function renderSubjectGrid(subjects) {
         `;
 
         grid.appendChild(card);
+    }
+
+    if (createCard) {
+        grid.appendChild(createCard);
     }
 }
 

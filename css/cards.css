@@ -47,6 +47,7 @@ Purpose:
 .subject-card,
 .notebook-card {
     cursor: pointer;
+    overflow: visible;
 }
 
 .subject-card::before,
@@ -231,4 +232,17 @@ Purpose:
     width: 24px;
     height: 24px;
     filter: none;
+}
+
+
+/* V2 library page controls */
+.section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+}
+
+.section-header .view-header-actions {
+    margin-left: auto;
 }

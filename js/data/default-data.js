@@ -18,7 +18,17 @@ function createDefaultData() {
         version: APP.DATA_VERSION,
 
         settings: {
-            theme: "light"
+            theme: "light",
+            practice: {
+                answerDisplayMode: "after-each"
+            },
+            checkingSystem: {
+                spellingStrict: true,
+                punctuationStrict: true,
+                partialCredit: true,
+                pointBased: true,
+                caseSensitive: false
+            }
         },
 
         subjects: [],

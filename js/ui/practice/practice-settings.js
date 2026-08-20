@@ -56,6 +56,19 @@ function openPracticeSettings() {
 
                 <div class="setting-row">
                     <div>
+                        <strong>Answer display</strong>
+                        <small>
+                            Choose when answers and results are revealed.
+                        </small>
+                    </div>
+                    <select id="practiceAnswerDisplay" class="field-select">
+                        <option value="after-each">Show answer after solving each question</option>
+                        <option value="after-all">Show answers after solving the entire exercise</option>
+                    </select>
+                </div>
+
+                <div class="setting-row">
+                    <div>
                         <strong>Auto-next</strong>
                         <small>
                             Advance after a correct answer.
@@ -89,6 +102,9 @@ function openPracticeSettings() {
             </button>
         `,
         onOpen: ({ host, close }) => {
+            host.querySelector("#practiceAnswerDisplay").value =
+                state.data.settings.practice?.answerDisplayMode || "after-each";
+
             host.querySelector(
                 "[data-dialog-cancel]"
             ).onclick = close;
@@ -96,10 +112,15 @@ function openPracticeSettings() {
             host.querySelector(
                 "[data-dialog-save]"
             ).onclick = () => {
-                state.practice.random =
-                    host.querySelector(
-                        "#practiceRandom"
-                    ).checked;
+                const nextRandom = host.querySelector("#practiceRandom").checked;
+                if (nextRandom !== state.practice.random) {
+                    state.practice.orderIds = [];
+                    state.practice.index = 0;
+                    state.practice.answers = {};
+                    state.practice.results = {};
+                    state.practice.exerciseComplete = false;
+                }
+                state.practice.random = nextRandom;
 
                 state.practice.showHints =
                     host.querySelector(
@@ -110,6 +131,13 @@ function openPracticeSettings() {
                     host.querySelector(
                         "#practiceAutoNext"
                     ).checked;
+
+                state.data.settings.practice.answerDisplayMode =
+                    host.querySelector("#practiceAnswerDisplay").value;
+                state.practice.answerDisplayMode =
+                    state.data.settings.practice.answerDisplayMode;
+
+                ns.saveStoredData(state.data);
 
                 close();
 

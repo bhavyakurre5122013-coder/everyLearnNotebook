@@ -256,3 +256,51 @@ input[type="color"] {
     border-color: var(--color-primary);
     box-shadow: var(--shadow-focus);
 }
+
+.settings-sections {
+    display: grid;
+    gap: var(--space-7);
+}
+
+.settings-section {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.settings-section-header h3 {
+    margin: 0;
+}
+
+.settings-section-header p {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.settings-control-grid {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.checking-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.setting-row-stack {
+    align-items: flex-start;
+}
+
+.compact-number {
+    width: 120px;
+}
+
+.setting-column-mobile {
+    align-items: flex-start;
+}

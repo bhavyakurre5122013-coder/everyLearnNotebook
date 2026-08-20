@@ -36,7 +36,7 @@ function renderCreateNotebookCard() {
         </div>
     `;
 
-    grid.prepend(card);
+    grid.appendChild(card);
 }
 
     ns.renderCreateNotebookCard = renderCreateNotebookCard;

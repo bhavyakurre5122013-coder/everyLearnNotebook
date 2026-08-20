@@ -55,6 +55,27 @@ function updateSubject(id, changes) {
     return subject;
 }
 
+
+function duplicateSubject(id, name) {
+    const source = getSubject(id);
+    if (!source) throw new Error("Subject not found.");
+    const subject = {
+        ...structuredClone(source),
+        id: createId("subject"),
+        name: String(name || `${source.name} Copy`).trim()
+    };
+    state.data.subjects.push(subject);
+
+    const linked = state.data.notebooks.filter(notebook => notebook.subjectId === id);
+    for (const notebook of linked) {
+        const clone = ns.duplicateNotebook(notebook.id, `${notebook.name} Copy`, subject.id);
+        clone.subjectId = subject.id;
+    }
+
+    saveStoredData(state.data);
+    return subject;
+}
+
 function deleteSubject(id) {
     if (!getSubject(id)) throw new Error("Subject not found.");
 
@@ -79,4 +100,5 @@ function deleteSubject(id) {
     ns.createSubject = createSubject;
     ns.updateSubject = updateSubject;
     ns.deleteSubject = deleteSubject;
+    ns.duplicateSubject = duplicateSubject;
 })(window.everyLearn);

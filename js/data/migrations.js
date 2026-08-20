@@ -50,6 +50,25 @@ function migrateData(input) {
             ? "dark"
             : "light";
 
+    if (!data.settings.practice || typeof data.settings.practice !== "object") {
+        data.settings.practice = {};
+    }
+    data.settings.practice.answerDisplayMode =
+        data.settings.practice.answerDisplayMode === "after-all"
+            ? "after-all"
+            : "after-each";
+
+    if (!data.settings.checkingSystem || typeof data.settings.checkingSystem !== "object") {
+        data.settings.checkingSystem = {};
+    }
+    data.settings.checkingSystem = {
+        spellingStrict: data.settings.checkingSystem.spellingStrict !== false,
+        punctuationStrict: data.settings.checkingSystem.punctuationStrict !== false,
+        partialCredit: data.settings.checkingSystem.partialCredit !== false,
+        pointBased: data.settings.checkingSystem.pointBased !== false,
+        caseSensitive: Boolean(data.settings.checkingSystem.caseSensitive)
+    };
+
     /*
         Remove the old concept of notebook type if an older
         version had it. The existence of subjectId now defines
@@ -79,6 +98,7 @@ function migrateData(input) {
                 if (!Array.isArray(chapter.topics)) {
                     chapter.topics = [];
                 }
+                for (const topic of chapter.topics) normalizeQuestions(topic);
             }
         }
 
@@ -86,6 +106,23 @@ function migrateData(input) {
             if (!Array.isArray(chapter.topics)) {
                 chapter.topics = [];
             }
+            for (const topic of chapter.topics) normalizeQuestions(topic);
+        }
+    }
+
+
+    function normalizeQuestions(topic) {
+        if (!Array.isArray(topic.questions)) return;
+        for (const question of topic.questions) {
+            question.notes = typeof question.notes === "string" ? question.notes : "";
+            question.marks = Math.max(0, Number(question.marks) || 1);
+            question.checking = {
+                spellingStrict: question.checking?.spellingStrict !== false,
+                punctuationStrict: question.checking?.punctuationStrict !== false,
+                partialCredit: question.checking?.partialCredit !== false,
+                pointBased: question.checking?.pointBased !== false,
+                caseSensitive: Boolean(question.checking?.caseSensitive)
+            };
         }
     }
 

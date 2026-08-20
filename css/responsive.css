@@ -276,3 +276,27 @@ Rule:
         opacity: 1;
     }
 }
+
+@media (max-width: 650px) {
+    .question-list-header-actions {
+        width: 100%;
+    }
+
+    .question-list-header-actions > * {
+        flex: 1;
+    }
+
+    .practice-results-summary,
+    .practice-result-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .setting-column-mobile {
+        align-items: stretch;
+    }
+
+    .compact-number {
+        width: 100%;
+    }
+}

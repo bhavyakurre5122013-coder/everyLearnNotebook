@@ -14,10 +14,6 @@ function renderNotebookGrid(notebooks) {
 
     grid.innerHTML = "";
 
-    if (createCard) {
-        grid.appendChild(createCard);
-    }
-
     for (const notebook of notebooks) {
         const card =
             document.createElement("article");
@@ -36,6 +32,9 @@ function renderNotebookGrid(notebooks) {
         );
 
         card.innerHTML = `
+            <div class="card-actions">
+                ${ns.renderItemActionMenu("notebook", notebook.id, { label: notebook.name })}
+            </div>
             <div
                 class="card-icon"
                 aria-hidden="true"
@@ -77,6 +76,10 @@ function renderNotebookGrid(notebooks) {
         `;
 
         grid.appendChild(card);
+    }
+
+    if (createCard) {
+        grid.appendChild(createCard);
     }
 }
 

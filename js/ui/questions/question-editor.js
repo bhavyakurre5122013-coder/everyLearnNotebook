@@ -66,21 +66,7 @@ function renderQuestionEditor() {
             </div>
 
             <div class="builder-actions">
-                <button
-                    class="secondary-button small-button"
-                    type="button"
-                    data-duplicate-question
-                >
-                    Duplicate
-                </button>
-
-                <button
-                    class="delete-button small-button"
-                    type="button"
-                    data-delete-question
-                >
-                    ×
-                </button>
+                ${ns.renderItemActionMenu("question", question.id, { label: question.text || "Question" })}
             </div>
         </div>
 
@@ -134,52 +120,7 @@ function renderQuestionEditor() {
         renderQuestionManager();
     };
 
-    panel.querySelector(
-        "[data-duplicate-question]"
-    ).onclick = () => {
-        const copy =
-            duplicateQuestion(
-                state.notebookId,
-                state.topicId,
-                question.id
-            );
 
-        state.editingQuestionId =
-            copy.id;
-
-        renderQuestionManager();
-    };
-
-    panel.querySelector(
-        "[data-delete-question]"
-    ).onclick = async () => {
-        const confirmed =
-            await confirmAction({
-                title: "Delete question?",
-                message:
-                    "This removes the question and all of its sub-parts.",
-                confirmText:
-                    "Delete question"
-            });
-
-        if (!confirmed) return;
-
-        deleteQuestion(
-            state.notebookId,
-            state.topicId,
-            question.id
-        );
-
-        state.editingQuestionId =
-            null;
-
-        renderQuestionManager();
-
-        showToast({
-            message: "Question deleted.",
-            type: "success"
-        });
-    };
 }
 
 function renderQuestionType(question) {

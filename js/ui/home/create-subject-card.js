@@ -36,7 +36,7 @@ function renderCreateSubjectCard() {
         </div>
     `;
 
-    grid.prepend(card);
+    grid.appendChild(card);
 }
 
     ns.renderCreateSubjectCard = renderCreateSubjectCard;

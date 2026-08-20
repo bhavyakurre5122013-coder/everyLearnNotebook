@@ -189,252 +189,59 @@
         );
     }
 
-    function renderSection(
-        section
-    ) {
+    function renderSection(section) {
         return `
             <div class="tree-section">
-
                 <div class="tree-label">
-
-                    <span>
-                        ${escapeHTML(
-                            section.name
-                        )}
-                    </span>
-
-                    <span class="tree-actions">
-
-                        <button
-                            class="edit-button small-button"
-                            data-edit-section="${section.id}"
-                            type="button"
-                            aria-label="Edit section"
-                            title="Edit section"
-                        >
-                            <img
-                                src="./assets/icons/ui/pencil.svg"
-                                alt=""
-                            >
-                        </button>
-
-                        <button
-                            class="delete-button small-button"
-                            data-delete-section="${section.id}"
-                            type="button"
-                            aria-label="Delete section"
-                            title="Delete section"
-                        >
-                            <img
-                                src="./assets/icons/ui/delete.svg"
-                                alt=""
-                            >
-                        </button>
-
-                    </span>
-
+                    <span>${escapeHTML(section.name)}</span>
+                    ${ns.renderItemActionMenu("section", section.id, { label: section.name })}
                 </div>
-
                 <div class="tree-chapters">
-
-                    ${
-                        (section.chapters || [])
-                            .map(
-                                chapter =>
-                                    renderChapter(
-                                        chapter
-                                    )
-                            )
-                            .join("")
-                    }
-
+                    ${(section.chapters || []).map(chapter => renderChapter(chapter)).join("")}
                 </div>
-
             </div>
         `;
     }
 
-    function renderRootChapter(
-        chapter
-    ) {
+    function renderRootChapter(chapter) {
         return `
             <div class="tree-root-chapter">
-
                 <div class="tree-item-wrap">
-
-                    <div class="tree-item tree-chapter-label">
-                        ${escapeHTML(
-                            chapter.name
-                        )}
-                    </div>
-
-                    <div class="tree-item-actions">
-
-                        <button
-                            class="edit-button small-button"
-                            data-edit-chapter="${chapter.id}"
-                            type="button"
-                            aria-label="Edit chapter"
-                            title="Edit chapter"
-                        >
-                            <img
-                                src="./assets/icons/ui/pencil.svg"
-                                alt=""
-                            >
-                        </button>
-
-                        <button
-                            class="delete-button small-button"
-                            data-delete-chapter="${chapter.id}"
-                            type="button"
-                            aria-label="Delete chapter"
-                            title="Delete chapter"
-                        >
-                            <img
-                                src="./assets/icons/ui/delete.svg"
-                                alt=""
-                            >
-                        </button>
-
-                    </div>
-
+                    <div class="tree-item tree-chapter-label">${escapeHTML(chapter.name)}</div>
+                    ${ns.renderItemActionMenu("chapter", chapter.id, { label: chapter.name })}
                 </div>
-
                 <div class="tree-topics">
-
-                    ${
-                        (chapter.topics || [])
-                            .map(
-                                topic =>
-                                    renderTopic(
-                                        topic
-                                    )
-                            )
-                            .join("")
-                    }
-
+                    ${(chapter.topics || []).map(topic => renderTopic(topic)).join("")}
                 </div>
-
             </div>
         `;
     }
 
-    function renderChapter(
-        chapter
-    ) {
+    function renderChapter(chapter) {
         return `
             <div class="tree-chapter">
-
                 <div class="tree-item-wrap">
-
-                    <div class="tree-item tree-chapter-label">
-                        ${escapeHTML(
-                            chapter.name
-                        )}
-                    </div>
-
-                    <div class="tree-item-actions">
-
-                        <button
-                            class="edit-button small-button"
-                            data-edit-chapter="${chapter.id}"
-                            type="button"
-                            aria-label="Edit chapter"
-                            title="Edit chapter"
-                        >
-                            <img
-                                src="./assets/icons/ui/pencil.svg"
-                                alt=""
-                            >
-                        </button>
-
-                        <button
-                            class="delete-button small-button"
-                            data-delete-chapter="${chapter.id}"
-                            type="button"
-                            aria-label="Delete chapter"
-                            title="Delete chapter"
-                        >
-                            <img
-                                src="./assets/icons/ui/delete.svg"
-                                alt=""
-                            >
-                        </button>
-
-                    </div>
-
+                    <div class="tree-item tree-chapter-label">${escapeHTML(chapter.name)}</div>
+                    ${ns.renderItemActionMenu("chapter", chapter.id, { label: chapter.name })}
                 </div>
-
                 <div class="tree-topics">
-
-                    ${
-                        (chapter.topics || [])
-                            .map(
-                                topic =>
-                                    renderTopic(
-                                        topic
-                                    )
-                            )
-                            .join("")
-                    }
-
+                    ${(chapter.topics || []).map(topic => renderTopic(topic)).join("")}
                 </div>
-
             </div>
         `;
     }
 
-    function renderTopic(
-        topic
-    ) {
+    function renderTopic(topic) {
         return `
             <div class="tree-item-wrap">
-
                 <button
-                    class="tree-item ${
-                        topic.id ===
-                        state.topicId
-                            ? "active"
-                            : ""
-                    }"
+                    class="tree-item ${topic.id === state.topicId ? "active" : ""}"
                     data-topic="${topic.id}"
                     type="button"
                 >
-                    ${escapeHTML(
-                        topic.name
-                    )}
+                    ${escapeHTML(topic.name)}
                 </button>
-
-                <div class="tree-item-actions">
-
-                    <button
-                        class="edit-button small-button"
-                        data-edit-topic="${topic.id}"
-                        type="button"
-                        aria-label="Edit topic"
-                        title="Edit topic"
-                    >
-                        <img
-                            src="./assets/icons/ui/pencil.svg"
-                            alt=""
-                        >
-                    </button>
-
-                    <button
-                        class="delete-button small-button"
-                        data-delete-topic="${topic.id}"
-                        type="button"
-                        aria-label="Delete topic"
-                        title="Delete topic"
-                    >
-                        <img
-                            src="./assets/icons/ui/delete.svg"
-                            alt=""
-                        >
-                    </button>
-
-                </div>
-
+                ${ns.renderItemActionMenu("topic", topic.id, { label: topic.name })}
             </div>
         `;
     }
@@ -954,129 +761,8 @@
             );
     }
 
-    function bindTreeActions(
-        tree,
-        notebook
-    ) {
-        tree.querySelectorAll(
-            "[data-edit-section]"
-        ).forEach(
-            button =>
-                button.onclick = () =>
-                    inlineEdit(
-                        "Section",
-                        button.dataset
-                            .editSection,
-                        value =>
-                            updateSection(
-                                notebook.id,
-                                button.dataset
-                                    .editSection,
-                                {
-                                    name:
-                                        value
-                                }
-                            )
-                    )
-        );
-
-        tree.querySelectorAll(
-            "[data-delete-section]"
-        ).forEach(
-            button =>
-                button.onclick = () =>
-                    deleteTreeItem(
-                        "section",
-                        button.dataset
-                            .deleteSection,
-                        () =>
-                            deleteSection(
-                                notebook.id,
-                                button.dataset
-                                    .deleteSection
-                            )
-                    )
-        );
-
-        tree.querySelectorAll(
-            "[data-edit-chapter]"
-        ).forEach(
-            button =>
-                button.onclick = () =>
-                    inlineEdit(
-                        "Chapter",
-                        button.dataset
-                            .editChapter,
-                        value =>
-                            updateChapter(
-                                notebook.id,
-                                button.dataset
-                                    .editChapter,
-                                {
-                                    name:
-                                        value
-                                }
-                            )
-                    )
-        );
-
-        tree.querySelectorAll(
-            "[data-delete-chapter]"
-        ).forEach(
-            button =>
-                button.onclick = () =>
-                    deleteTreeItem(
-                        "chapter",
-                        button.dataset
-                            .deleteChapter,
-                        () =>
-                            deleteChapter(
-                                notebook.id,
-                                button.dataset
-                                    .deleteChapter
-                            )
-                    )
-        );
-
-        tree.querySelectorAll(
-            "[data-edit-topic]"
-        ).forEach(
-            button =>
-                button.onclick = () =>
-                    inlineEdit(
-                        "Topic",
-                        button.dataset
-                            .editTopic,
-                        value =>
-                            updateTopic(
-                                notebook.id,
-                                button.dataset
-                                    .editTopic,
-                                {
-                                    name:
-                                        value
-                                }
-                            )
-                    )
-        );
-
-        tree.querySelectorAll(
-            "[data-delete-topic]"
-        ).forEach(
-            button =>
-                button.onclick = () =>
-                    deleteTreeItem(
-                        "topic",
-                        button.dataset
-                            .deleteTopic,
-                        () =>
-                            deleteTopic(
-                                notebook.id,
-                                button.dataset
-                                    .deleteTopic
-                            )
-                    )
-        );
+    function bindTreeActions(tree, notebook) {
+        // Item actions are handled by the shared delegated action-menu controller.
     }
 
     function bindTopicSelection(

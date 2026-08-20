@@ -1,0 +1,378 @@
+.rich-format-launcher {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border, #D8E1EA);
+    border-radius: 9px;
+    background: #fff;
+    color: #1F64E5;
+    box-shadow: 0 3px 10px rgba(23,32,51,.08);
+    cursor: pointer;
+    z-index: 4;
+}
+.rich-format-launcher:hover { transform: translateY(-1px); }
+.rich-format-launcher svg { width: 18px; height: 18px; }
+
+.rich-editor {
+    position: relative;
+    border: 1px solid var(--border, #D8E1EA);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(23,32,51,.06);
+    overflow: hidden;
+}
+.rich-editor-topbar {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 7px 8px 0;
+    border-bottom: 1px solid var(--border, #D8E1EA);
+    background: #F8FAFC;
+    overflow-x: auto;
+}
+.rich-editor-toolbar {
+    display: flex;
+    flex: 1;
+    min-width: max-content;
+}
+.rich-editor-group {
+    display: flex;
+    flex-direction: column;
+    padding: 0 7px;
+    border-right: 1px solid #D8E1EA;
+}
+.rich-editor-group:first-child { padding-left: 0; }
+.rich-editor-group:last-child { border-right: 0; }
+.rich-editor-group-controls {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 34px;
+}
+.rich-editor-group-label {
+    padding: 2px 2px 5px;
+    color: #64748B;
+    font-size: 10px;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+.rich-tool-button,
+.rich-tool-select {
+    height: 34px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: #172033;
+}
+.rich-tool-button {
+    width: 34px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    cursor: pointer;
+}
+.rich-tool-button:hover,
+.rich-tool-button:focus-visible,
+.rich-tool-select:hover,
+.rich-tool-select:focus-visible {
+    border-color: #C8D4E2;
+    background: #EAF1FB;
+    outline: none;
+}
+.rich-tool-button svg { width: 21px; height: 21px; }
+.rich-tool-select {
+    min-width: 96px;
+    min-height: 34px;
+    padding: 0 22px 0 9px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+.rich-editor-content {
+    min-height: 150px;
+    padding: 14px 16px;
+    outline: none;
+    line-height: 1.5;
+    color: var(--text, #172033);
+    background: #fff;
+}
+.rich-editor-content:empty::before {
+    content: "Write here…";
+    color: #94A3B8;
+}
+.rich-editor-close {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    margin: 2px 2px 0 0;
+    border: 1px solid #D8E1EA;
+    border-radius: 6px;
+    background: #fff;
+    color: #64748B;
+    font-size: 18px;
+    cursor: pointer;
+    order: 3;
+}
+.rich-editor-close:hover { background: #F1F5F9; color: #172033; }
+.rich-format-launcher-in-editor {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 34px;
+    height: 34px;
+    margin: 0;
+    box-shadow: 0 3px 10px rgba(23,32,51,.08);
+    z-index: 6;
+}
+.rich-source-textarea { display: none !important; }
+.rich-editor .rich-editor-content p,
+.rich-editor .rich-editor-content h1,
+.rich-editor .rich-editor-content h2,
+.rich-editor .rich-editor-content h3,
+.rich-editor .rich-editor-content h4,
+.rich-editor .rich-editor-content h5,
+.rich-editor .rich-editor-content h6 { margin-top: 0; }
+
+@media (max-width: 860px) {
+    .rich-editor-group-label { font-size: 9px; }
+    .rich-tool-button { width: 32px; }
+    .rich-tool-select { min-width: 84px; }
+}
+
+/* Robust ribbon controls: custom dropdowns avoid native select interference. */
+.rich-dropdown {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+}
+
+.rich-tool-select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 116px;
+    padding: 0 9px;
+    border: 1px solid #CBD5E1;
+    border-radius: 7px;
+    background: #FFFFFF;
+    color: #172033;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.rich-tool-select svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+}
+
+.rich-dropdown-menu {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 4px);
+    z-index: 1000;
+    min-width: 100%;
+    width: max-content;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 5px;
+    border: 1px solid #CBD5E1;
+    border-radius: 9px;
+    background: #FFFFFF;
+    box-shadow: 0 12px 32px rgba(23,32,51,.18);
+    display: none;
+}
+
+.rich-dropdown.is-open .rich-dropdown-menu {
+    display: block;
+}
+
+.rich-dropdown-item {
+    display: block;
+    width: 100%;
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #172033;
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.rich-dropdown-item:hover,
+.rich-dropdown-item:focus-visible {
+    background: #EAF1FB;
+    outline: none;
+}
+
+.rich-tool-button {
+    width: 40px;
+    height: 40px;
+}
+
+.rich-tool-button svg {
+    width: 27px !important;
+    height: 27px !important;
+}
+
+.rich-editor-group-controls {
+    min-height: 40px;
+    gap: 4px;
+}
+
+/* Fix ribbon control sizing and native dropdown interaction. */
+.rich-tool-button {
+    width: 40px;
+    height: 40px;
+}
+
+.rich-tool-button svg {
+    width: 27px !important;
+    height: 27px !important;
+}
+
+.rich-tool-select {
+    height: 40px;
+    min-height: 40px;
+    min-width: 110px;
+    border: 1px solid #CBD5E1;
+    border-radius: 7px;
+    background: #FFFFFF;
+    color: #172033;
+    padding: 0 26px 0 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.rich-tool-select option {
+    background: #FFFFFF;
+    color: #172033;
+}
+
+.rich-editor-group-controls {
+    min-height: 40px;
+}
+
+/* V3 Notes-style ribbon controls */
+.rich-editor-topbar {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 10px 0;
+    border-bottom: 1px solid #D8E1EA;
+    background: #F8FAFC;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+}
+.rich-editor-toolbar {
+    display: flex;
+    flex: 1 0 auto;
+    min-width: max-content;
+}
+.rich-editor-group {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 78px;
+    padding: 0 8px;
+    border-right: 1px solid #E3EAF2;
+}
+.rich-editor-group:first-child { padding-left: 0; }
+.rich-editor-group:last-child { border-right: 0; }
+.rich-editor-group-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 54px;
+}
+.rich-editor-group-label {
+    margin-top: auto;
+    padding: 3px 4px 6px;
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+.rich-tool-button {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    color: #172033;
+    cursor: pointer;
+    user-select: none;
+}
+.rich-tool-button:hover,
+.rich-tool-button:focus-visible {
+    border-color: #CBD5E1;
+    background: #FFFFFF;
+    outline: none;
+}
+.rich-tool-button svg {
+    width: 19px !important;
+    height: 19px !important;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+.rich-tool-select {
+    min-height: 34px;
+    max-width: 156px;
+    padding: 0 28px 0 8px;
+    border: 1px solid #CBD5E1;
+    border-radius: 3px;
+    color: #172033;
+    background: #FFFFFF;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+}
+.rich-tool-select:focus {
+    outline: none;
+    border-color: #2D6AE3;
+    box-shadow: 0 0 0 3px rgba(45,106,227,.12);
+}
+.rich-editor-close {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    margin: 2px 2px 0 0;
+    border: 1px solid #D8E1EA;
+    border-radius: 6px;
+    background: #FFFFFF;
+    color: #64748B;
+    font-size: 18px;
+    cursor: pointer;
+    order: 3;
+}
+@media (max-width: 900px) {
+    .rich-editor-topbar { padding-inline: 6px; }
+    .rich-editor-group { padding-inline: 6px; }
+    .rich-tool-select { max-width: 132px; }
+}

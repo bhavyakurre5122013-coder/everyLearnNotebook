@@ -4,6 +4,9 @@
     const getSubject = (...args) => ns.getSubject(...args);
     const openDialog = (...args) => ns.openDialog(...args);
     const updateNotebook = (...args) => ns.updateNotebook(...args);
+    const deleteNotebook = (...args) => ns.deleteNotebook(...args);
+    const confirmAction = (...args) => ns.confirmAction(...args);
+    const openNotebooksPage = (...args) => ns.openNotebooksPage(...args);
 /* everyLearn — Workspace Sidebar */
 
 
@@ -29,30 +32,16 @@ function renderSidebar(notebook) {
         </div>
 
         <div class="sidebar-header-subtitle">
-            ${
-                subject
-                    ? escapeHTML(subject.name)
-                    : "No subject"
-            }
+            ${subject ? escapeHTML(subject.name) : "No subject"}
         </div>
 
         <div class="sidebar-header-actions">
-            <button
-                class="edit-button small-button"
-                type="button"
-                data-edit-notebook
-            >
-                <img src="./assets/icons/ui/pencil.svg" alt="">
-                Edit notebook
-            </button>
+            ${window.everyLearn.renderItemActionMenu("notebook", notebook.id, { label: notebook.name })}
         </div>
     `;
 
     ensureSidebarResizer();
 
-    header.querySelector(
-        "[data-edit-notebook]"
-    ).onclick = () => openNotebookEdit(notebook);
 }
 
 function openNotebookEdit(notebook) {
@@ -365,4 +354,5 @@ function escapeHTML(value) {
 }
 
     ns.renderSidebar = renderSidebar;
+    ns.openNotebookEdit = openNotebookEdit;
 })(window.everyLearn);
