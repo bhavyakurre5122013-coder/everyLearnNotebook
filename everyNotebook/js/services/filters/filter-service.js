@@ -2,6 +2,7 @@
     "use strict";
 
     const state = ns.state;
+    const walkNotebookHierarchy = (...args) => ns.walkNotebookHierarchy(...args);
 
     /* everyLearnNotebook — Question Filter Service */
 
@@ -28,48 +29,42 @@
         const results = [];
 
         for (const notebook of state.data.notebooks) {
-            const visitChapter = (chapter, section = null) => {
-                for (const topic of chapter.topics || []) {
-                    let scopeMatch = true;
+            walkNotebookHierarchy(notebook, ({
+                type,
+                section,
+                chapter,
+                topic,
+                question
+            }) => {
+                if (type !== "question") return;
 
-                    if (level === "subject") {
-                        scopeMatch = notebook.subjectId === targetId;
-                    } else if (level === "notebook") {
-                        scopeMatch = notebook.id === targetId;
-                    } else if (level === "section") {
-                        scopeMatch = section?.id === targetId;
-                    } else if (level === "chapter") {
-                        scopeMatch = chapter.id === targetId;
-                    } else if (level === "topic") {
-                        scopeMatch = topic.id === targetId;
-                    }
+                let scopeMatch = true;
 
-                    for (const question of topic.questions || []) {
-                        if (
-                            scopeMatch &&
-                            matchesQuestionFilter(question, filterId)
-                        ) {
-                            results.push({
-                                question,
-                                notebook,
-                                section,
-                                chapter,
-                                topic
-                            });
-                        }
-                    }
+                if (level === "subject") {
+                    scopeMatch = notebook.subjectId === targetId;
+                } else if (level === "notebook") {
+                    scopeMatch = notebook.id === targetId;
+                } else if (level === "section") {
+                    scopeMatch = section?.id === targetId;
+                } else if (level === "chapter") {
+                    scopeMatch = chapter.id === targetId;
+                } else if (level === "topic") {
+                    scopeMatch = topic.id === targetId;
                 }
-            };
 
-            for (const chapter of notebook.rootChapters || []) {
-                visitChapter(chapter, null);
-            }
-
-            for (const section of notebook.sections || []) {
-                for (const chapter of section.chapters || []) {
-                    visitChapter(chapter, section);
+                if (
+                    scopeMatch &&
+                    matchesQuestionFilter(question, filterId)
+                ) {
+                    results.push({
+                        question,
+                        notebook,
+                        section,
+                        chapter,
+                        topic
+                    });
                 }
-            }
+            });
         }
 
         return results;
