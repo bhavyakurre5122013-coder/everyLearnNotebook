@@ -68,6 +68,9 @@ const ACTIONS = {
 
 const ROUTES = {
     HOME: "home",
+    SUBJECTS: "subjects",
+    NOTEBOOKS: "notebooks",
+    SUBJECT: "subject",
     WORKSPACE: "workspace"
 };
 

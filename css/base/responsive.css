@@ -1,0 +1,302 @@
+/*
+=============================================================
+everyLearn — Responsive
+-------------------------------------------------------------
+Purpose:
+    Tablet and mobile layouts.
+
+Rule:
+    Feature styles remain in their feature files. This file
+    only changes layout for narrower screens.
+=============================================================
+*/
+
+@media (max-width: 1100px) {
+
+    :root {
+        --workspace-sidebar-width: 280px;
+        --question-list-width: 290px;
+        --page-padding: 20px;
+    }
+
+    .workspace-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-sidebar {
+        position: fixed;
+
+        top: var(--ribbon-height);
+        left: 0;
+        bottom: 0;
+
+        z-index: var(--z-sidebar);
+
+        width: min(
+            var(--workspace-sidebar-width),
+            88vw
+        );
+
+        height: auto;
+
+        transform: translateX(-100%);
+
+        box-shadow: var(--shadow-lg);
+
+        transition:
+            transform var(--duration-normal) var(--ease-standard);
+    }
+
+    .workspace-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .workspace-sidebar-toggle {
+        display: inline-grid;
+    }
+
+    .question-manager-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .question-list-panel {
+        min-height: auto;
+    }
+
+    .question-list {
+        max-height: 320px;
+    }
+
+    .practice-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .app-ribbon {
+        grid-template-columns: auto 1fr auto;
+
+        padding-inline: var(--space-4);
+    }
+
+    .ribbon-center {
+        justify-content: flex-start;
+    }
+
+    .workspace-content {
+        padding: var(--space-8);
+    }
+
+    .workspace-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .workspace-actions {
+        justify-content: flex-start;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full {
+        grid-column: auto;
+    }
+
+    .choice-builder-row {
+        grid-template-columns: 24px minmax(0, 1fr);
+    }
+
+    .choice-builder-row > button,
+    .choice-builder-row > label {
+        grid-column: 2;
+    }
+
+    .order-row {
+        grid-template-columns: 40px minmax(0, 1fr);
+    }
+
+    .order-row > button,
+    .order-row > label {
+        grid-column: 2;
+    }
+
+    .practice-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .practice-navigation,
+    .practice-answer-actions {
+        justify-content: flex-start;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    :root {
+        --page-padding: 12px;
+        --ribbon-height: 58px;
+    }
+
+    .view {
+        width: min(
+            100% - (var(--page-padding) * 2),
+            var(--page-width)
+        );
+
+        padding-block:
+            var(--space-9)
+            var(--space-12);
+    }
+
+    .view-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .view-header h1 {
+        font-size: 32px;
+    }
+
+    .view-header-actions {
+        justify-content: flex-start;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-content {
+        padding: var(--space-6);
+    }
+
+    .content-tabs,
+    .question-mode-tabs {
+        width: 100%;
+    }
+
+    .content-tab,
+    .question-mode-tab {
+        flex: 1;
+        text-align: center;
+    }
+
+    .question-editor-header {
+        flex-direction: column;
+    }
+
+    .question-editor-body {
+        padding: var(--space-6);
+    }
+
+    .question-meta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .notes-editor {
+        min-height: 380px;
+        padding: var(--space-7);
+    }
+
+    .notes-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .notes-save-state {
+        margin-right: 0;
+    }
+
+    .dialog-backdrop {
+        padding: 10px;
+    }
+
+    .dialog {
+        max-height: 94vh;
+        border-radius: var(--radius-lg);
+    }
+
+    .dialog-body {
+        padding: var(--space-6);
+    }
+
+    .dialog-footer {
+        padding: var(--space-5);
+    }
+
+    .setting-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .matching-columns {
+        gap: var(--space-10);
+        grid-template-columns: 1fr;
+    }
+
+    .matching-line-layer {
+        display: none;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .ribbon-right {
+        gap: 0;
+    }
+
+    .ribbon-button {
+        width: 36px;
+        height: 36px;
+    }
+
+    .workspace-actions,
+    .builder-actions,
+    .subpart-actions,
+    .practice-navigation,
+    .practice-answer-actions {
+        width: 100%;
+    }
+
+    .workspace-actions > *,
+    .builder-actions > *,
+    .practice-navigation > *,
+    .practice-answer-actions > * {
+        flex: 1;
+    }
+
+    .card-actions {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 650px) {
+    .question-list-header-actions {
+        width: 100%;
+    }
+
+    .question-list-header-actions > * {
+        flex: 1;
+    }
+
+    .practice-results-summary,
+    .practice-result-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .setting-column-mobile {
+        align-items: stretch;
+    }
+
+    .compact-number {
+        width: 100%;
+    }
+}

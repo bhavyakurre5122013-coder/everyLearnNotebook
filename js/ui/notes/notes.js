@@ -24,6 +24,7 @@ function renderNotes(topic) {
     if (!editor || !footer) return;
 
     renderNotesToolbar();
+    ns.notesEditorAPI?.attachSelectionTracking();
 
     if (document.activeElement !== editor) {
         editor.innerHTML =

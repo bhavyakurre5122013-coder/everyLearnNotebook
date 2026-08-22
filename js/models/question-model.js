@@ -31,7 +31,16 @@ function createQuestion(type = "text") {
         answerData: {},
         attempts: 0,
         correct: 0,
-        lastPractice: null
+        lastPractice: null,
+        notes: "",
+        marks: 1,
+        checking: {
+            spellingStrict: true,
+            punctuationStrict: true,
+            partialCredit: true,
+            pointBased: true,
+            caseSensitive: false
+        }
     };
 }
 

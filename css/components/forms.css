@@ -1,0 +1,306 @@
+/*
+=============================================================
+everyLearn — Forms
+-------------------------------------------------------------
+Purpose:
+    Shared input, select, textarea and form-group styling.
+
+Important:
+    Native dropdown menus are intentionally left to the
+    operating system/browser for their option popup rendering.
+    The closed select control itself is styled here.
+=============================================================
+*/
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-7);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-group > label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select,
+.field-input,
+.field-textarea,
+.field-select {
+    width: 100%;
+
+    min-height: var(--control-height);
+
+    padding:
+        var(--space-4)
+        var(--space-5);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text);
+    background: var(--color-surface-soft);
+
+    outline: none;
+
+    transition:
+        border-color var(--duration-fast) var(--ease-standard),
+        box-shadow var(--duration-fast) var(--ease-standard),
+        background-color var(--duration-fast) var(--ease-standard);
+}
+
+.form-group textarea,
+.field-textarea {
+    min-height: 110px;
+    resize: vertical;
+    line-height: var(--line-height-normal);
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover,
+.field-input:hover,
+.field-textarea:hover,
+.field-select:hover {
+    border-color: var(--color-border-strong);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.field-input:focus,
+.field-textarea:focus,
+.field-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-focus);
+    background: var(--color-surface);
+}
+
+/* ---------------------------------------------------------
+   Native select control
+--------------------------------------------------------- */
+
+select {
+    appearance: auto;
+    cursor: pointer;
+}
+
+option {
+    color: #111111;
+    background: #FFFFFF;
+}
+
+@media (prefers-color-scheme: dark) {
+    option {
+        color: #FFFFFF;
+        background: #191D24;
+    }
+}
+
+/* ---------------------------------------------------------
+   Checkbox / radio
+--------------------------------------------------------- */
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: 16px;
+    height: 16px;
+
+    accent-color: var(--color-primary);
+}
+
+/* ---------------------------------------------------------
+   Color inputs
+--------------------------------------------------------- */
+
+input[type="color"] {
+    width: 48px;
+    min-height: 40px;
+
+    padding: 3px;
+
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------
+   Search
+--------------------------------------------------------- */
+
+.search-input-wrap {
+    position: relative;
+}
+
+.search-input {
+    padding-left: 40px;
+}
+
+.search-input-icon {
+    position: absolute;
+    left: var(--space-5);
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: var(--color-text-secondary);
+
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   Inline form controls
+--------------------------------------------------------- */
+
+.inline-field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.inline-field > input,
+.inline-field > select {
+    flex: 1;
+}
+
+/* ---------------------------------------------------------
+   Form help / validation
+--------------------------------------------------------- */
+
+.form-help {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+}
+
+.form-error {
+    color: var(--color-danger);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+}
+
+.field-error {
+    border-color: var(--color-danger) !important;
+    box-shadow:
+        0 0 0 3px
+        var(--color-danger-soft) !important;
+}
+
+/* ---------------------------------------------------------
+   Setting rows
+--------------------------------------------------------- */
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-7);
+
+    padding: var(--space-6);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-surface);
+}
+
+.setting-row > div:first-child {
+    min-width: 0;
+}
+
+.setting-row strong {
+    display: block;
+}
+
+.setting-row small {
+    display: block;
+    margin-top: var(--space-2);
+    color: var(--color-text-secondary);
+}
+
+/* ---------------------------------------------------------
+   Compact fields used inside tables/subparts
+--------------------------------------------------------- */
+
+.table-input,
+.subpart-input {
+    width: 100%;
+
+    min-height: 34px;
+
+    padding:
+        var(--space-3)
+        var(--space-4);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text);
+    background: var(--color-surface);
+
+    outline: none;
+}
+
+.table-input:focus,
+.subpart-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-focus);
+}
+
+.settings-sections {
+    display: grid;
+    gap: var(--space-7);
+}
+
+.settings-section {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.settings-section-header h3 {
+    margin: 0;
+}
+
+.settings-section-header p {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.settings-control-grid {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.checking-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.setting-row-stack {
+    align-items: flex-start;
+}
+
+.compact-number {
+    width: 120px;
+}
+
+.setting-column-mobile {
+    align-items: flex-start;
+}

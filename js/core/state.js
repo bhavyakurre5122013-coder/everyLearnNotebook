@@ -24,6 +24,7 @@ const state = {
     topicId: null,
 
     homeSubjectFilterId: null,
+    subjectPageId: null,
 
     mainTab: "notes",
     questionMode: "manage",
@@ -37,7 +38,13 @@ const state = {
         autoNext: false,
         timerEnabled: false,
         seconds: 0,
-        timerId: null
+        timerId: null,
+        answers: {},
+        results: {},
+        exerciseComplete: false,
+        answerDisplayMode: "after-each",
+        orderIds: [],
+        exerciseStatus: {}
     },
 
     ui: {

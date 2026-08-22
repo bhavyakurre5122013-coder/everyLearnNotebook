@@ -8,17 +8,33 @@
 everyLearn — Navigation
 -------------------------------------------------------------
 Purpose:
-    Controls the Home ↔ Workspace transition and keeps
-    navigation state centralized.
+    Controls the Home ↔ Library pages ↔ Workspace transition
+    and keeps navigation state centralized.
 =============================================================
 */
-
-
-
 
 function goHome() {
     state.route = ROUTES.HOME;
     state.homeSubjectFilterId = null;
+    state.subjectPageId = null;
+    resetWorkspaceSelection();
+}
+
+function openSubjectsPage() {
+    state.route = ROUTES.SUBJECTS;
+    state.subjectPageId = null;
+    resetWorkspaceSelection();
+}
+
+function openNotebooksPage() {
+    state.route = ROUTES.NOTEBOOKS;
+    state.subjectPageId = null;
+    resetWorkspaceSelection();
+}
+
+function openSubjectPage(subjectId) {
+    state.route = ROUTES.SUBJECT;
+    state.subjectPageId = subjectId;
     resetWorkspaceSelection();
 }
 
@@ -26,6 +42,7 @@ function openWorkspace(notebookId, topicId = null) {
     state.route = ROUTES.WORKSPACE;
     state.notebookId = notebookId;
     state.topicId = topicId;
+    state.subjectPageId = null;
     state.practice.index = 0;
     state.editingQuestionId = null;
 }
@@ -47,6 +64,9 @@ function setQuestionMode(mode) {
 }
 
     ns.goHome = goHome;
+    ns.openSubjectsPage = openSubjectsPage;
+    ns.openNotebooksPage = openNotebooksPage;
+    ns.openSubjectPage = openSubjectPage;
     ns.openWorkspace = openWorkspace;
     ns.isHome = isHome;
     ns.isWorkspace = isWorkspace;
