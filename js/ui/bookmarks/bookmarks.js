@@ -4,6 +4,8 @@
     const deleteBookmark = (...args) => ns.deleteBookmark(...args);
     const getNotebook = (...args) => ns.getNotebook(...args);
     const findTopicContext = (...args) => ns.findTopicContext(...args);
+    const getSection = (...args) => ns.getSection(...args);
+    const getChapter = (...args) => ns.getChapter(...args);
     const openDialog = (...args) => ns.openDialog(...args);
     const confirmAction = (...args) => ns.confirmAction(...args);
     const showToast = (...args) => ns.showToast(...args);
@@ -78,14 +80,7 @@ function openBookmarkBrowser() {
                         if (!bookmark) return;
 
                         close();
-                        state.notebookId =
-                            bookmark.notebookId;
-                        state.topicId =
-                            bookmark.topicId;
-                        openWorkspace(
-                            bookmark.notebookId,
-                            bookmark.topicId
-                        );
+                        openBookmarkLocation(bookmark);
 
                         document.dispatchEvent(
                             new Event(
@@ -129,6 +124,72 @@ function openBookmarkBrowser() {
             );
         }
     });
+}
+
+function openBookmarkLocation(bookmark) {
+    const notebookId = bookmark.notebookId;
+    const notebook = getNotebook(notebookId);
+    if (!notebook) {
+        showToast({
+            message: "The bookmarked notebook no longer exists.",
+            type: "error"
+        });
+        return false;
+    }
+
+    let topicId = null;
+    let sectionId = null;
+    let chapterId = null;
+
+    if (bookmark.topicId) {
+        const context = findTopicContext(notebookId, bookmark.topicId);
+        if (!context) {
+            showToast({
+                message: "The bookmarked topic no longer exists.",
+                type: "error"
+            });
+            return false;
+        }
+        topicId = context.topic.id;
+        sectionId = context.section?.id || null;
+        chapterId = context.chapter?.id || null;
+    } else if (bookmark.chapterId) {
+        const chapter = getChapter(notebookId, bookmark.chapterId);
+        const parentSection =
+            notebook.sections?.find(
+                section =>
+                    section.chapters?.some(
+                        item => item.id === bookmark.chapterId
+                    )
+            ) || null;
+
+        if (!chapter) {
+            showToast({
+                message: "The bookmarked chapter no longer exists.",
+                type: "error"
+            });
+            return false;
+        }
+
+        chapterId = chapter.id;
+        sectionId = parentSection?.id || null;
+    } else if (bookmark.sectionId) {
+        const section = getSection(notebookId, bookmark.sectionId);
+        if (!section) {
+            showToast({
+                message: "The bookmarked section no longer exists.",
+                type: "error"
+            });
+            return false;
+        }
+        sectionId = section.id;
+    }
+
+    openWorkspace(notebookId, topicId);
+    state.sectionId = sectionId;
+    state.chapterId = chapterId;
+    state.topicId = topicId;
+    return true;
 }
 
 function renderBookmark(bookmark) {

@@ -176,16 +176,35 @@ function resolveDefaultTarget(scope) {
             .sections?.[0]?.id || null;
     }
 
-    if (scope === "chapter") {
-        return notebooks[0]
-            .sections?.[0]
-            ?.chapters?.[0]?.id || null;
+    if (scope === "section") {
+        for (const notebook of notebooks) {
+            const section = notebook.sections?.[0];
+            if (section?.id) return section.id;
+        }
+        return null;
     }
 
-    return notebooks[0]
-        .sections?.[0]
-        ?.chapters?.[0]
-        ?.topics?.[0]?.id || null;
+    if (scope === "chapter") {
+        for (const notebook of notebooks) {
+            const rootChapter = notebook.rootChapters?.[0];
+            if (rootChapter?.id) return rootChapter.id;
+
+            const sectionChapter = notebook.sections?.[0]?.chapters?.[0];
+            if (sectionChapter?.id) return sectionChapter.id;
+        }
+        return null;
+    }
+
+    for (const notebook of notebooks) {
+        const rootTopic = notebook.rootChapters?.[0]?.topics?.[0];
+        if (rootTopic?.id) return rootTopic.id;
+
+        const sectionTopic =
+            notebook.sections?.[0]?.chapters?.[0]?.topics?.[0];
+        if (sectionTopic?.id) return sectionTopic.id;
+    }
+
+    return null;
 }
 
 function escapeHTML(value) {
