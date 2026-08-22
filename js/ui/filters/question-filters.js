@@ -136,8 +136,8 @@ function renderResults(host) {
                                 ${escapeHTML(
                                     [
                                         result.notebook.name,
-                                        result.section.name,
-                                        result.chapter.name,
+                                        result.section?.name,
+                                        result.chapter?.name,
                                         result.topic.name
                                     ].join(" / ")
                                 )}

@@ -76,6 +76,8 @@ function renderQuestionManager() {
 
             state.editingQuestionId =
                 question.id;
+            state.editingQuestionDraft = null;
+            state.editingQuestionIsNew = true;
 
             renderQuestionManager();
         }
@@ -90,6 +92,8 @@ function renderQuestionManager() {
                 () => {
                     state.editingQuestionId =
                         button.dataset.questionId;
+                    state.editingQuestionDraft = null;
+                    state.editingQuestionIsNew = false;
                     renderQuestionManager();
                 }
             )

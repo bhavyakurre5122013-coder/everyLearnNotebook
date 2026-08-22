@@ -26,6 +26,7 @@ function addQuestion(notebookId, topicId, type = "text") {
     if (!topic) throw new Error("Topic not found.");
 
     const question = createQuestion(type);
+    ns.normalizeQuestion(question);
     topic.questions.push(question);
     saveStoredData(state.data);
     return question;
@@ -34,17 +35,43 @@ function addQuestion(notebookId, topicId, type = "text") {
 function updateQuestion(notebookId, topicId, questionId, changes) {
     const question = getQuestion(notebookId, topicId, questionId);
     if (!question) throw new Error("Question not found.");
+    if (!changes || typeof changes !== "object") throw new Error("Question changes are invalid.");
 
-    Object.assign(question, changes);
-    question.hints = Array.isArray(question.hints)
-        ? question.hints.slice(0, 4)
-        : [];
-    question.important = Math.max(
-        0, Math.min(3, Number(question.important) || 0)
-    );
-    question.difficulty = Math.max(
-        1, Math.min(3, Number(question.difficulty) || 1)
-    );
+    const next = structuredClone(question);
+    const incoming = structuredClone(changes);
+    const requestedType = incoming.type;
+    Object.assign(next, incoming);
+    next.id = question.id;
+
+    if (requestedType && requestedType !== question.type) {
+        ns.resetQuestionTypeData(next, requestedType);
+        const typeFields = {
+            text: ["answer"],
+            trueFalse: ["answer"],
+            fill: ["answerData"],
+            assertionReasoning: ["answerData"],
+            singleCorrect: ["options"],
+            multipleCorrect: ["options"],
+            ordering: ["orderItems"],
+            matching: ["pairs", "matchingConnections"],
+            difference: ["difference"],
+            caseBased: ["casePassage", "caseQuestions"]
+        };
+        for (const field of typeFields[requestedType] || []) {
+            if (Object.prototype.hasOwnProperty.call(incoming, field)) {
+                next[field] = structuredClone(incoming[field]);
+            }
+        }
+    }
+
+    ns.normalizeQuestion(next);
+    const errors = ns.validateQuestion(next);
+    if (errors.length) throw new Error(errors[0]);
+
+    Object.keys(question).forEach(key => {
+        if (!(key in next)) delete question[key];
+    });
+    Object.assign(question, next);
 
     saveStoredData(state.data);
     return question;
@@ -64,73 +91,6 @@ function deleteQuestion(notebookId, topicId, questionId) {
     saveStoredData(state.data);
 }
 
-function cloneQuestion(question) {
-    const source = structuredClone(question);
-    const idMap = new Map();
-
-    function prefixForId(id) {
-        const prefix = String(id).split("_")[0];
-        return prefix || "id";
-    }
-
-    function cloneValue(value) {
-        if (Array.isArray(value)) return value.map(cloneValue);
-        if (!value || typeof value !== "object") return value;
-
-        const result = {};
-        for (const [key, item] of Object.entries(value)) {
-            if (key === "id" && typeof item === "string") {
-                const newId = createId(prefixForId(item));
-                idMap.set(item, newId);
-                result[key] = newId;
-            } else {
-                result[key] = cloneValue(item);
-            }
-        }
-        return result;
-    }
-
-    const result = cloneValue(source);
-
-    // Matching connections use pair IDs as object keys and values rather than
-    // storing those references under an `id` property. Remap this known
-    // reference structure at every nesting level; arbitrary strings elsewhere
-    // remain untouched.
-    function remapKnownReferences(sourceValue, resultValue) {
-        if (!sourceValue || typeof sourceValue !== "object" || !resultValue || typeof resultValue !== "object") {
-            return;
-        }
-
-        if (sourceValue.matchingConnections && typeof sourceValue.matchingConnections === "object") {
-            resultValue.matchingConnections = Object.fromEntries(
-                Object.entries(sourceValue.matchingConnections)
-                    .map(([left, right]) => [
-                        idMap.get(left) || left,
-                        idMap.get(right) || right
-                    ])
-            );
-        }
-
-        if (Array.isArray(sourceValue)) {
-            sourceValue.forEach((item, index) => remapKnownReferences(item, resultValue[index]));
-            return;
-        }
-
-        for (const key of Object.keys(sourceValue)) {
-            if (key !== "matchingConnections") {
-                remapKnownReferences(sourceValue[key], resultValue[key]);
-            }
-        }
-    }
-
-    remapKnownReferences(source, result);
-
-    result.attempts = 0;
-    result.correct = 0;
-    result.lastPractice = null;
-    return result;
-}
-
 function duplicateQuestion(notebookId, topicId, questionId) {
     const original = getQuestion(notebookId, topicId, questionId);
     if (!original) throw new Error("Question not found.");
@@ -138,6 +98,58 @@ function duplicateQuestion(notebookId, topicId, questionId) {
     const copy = cloneQuestion(original);
     getTopic(notebookId, topicId).questions.push(copy);
     saveStoredData(state.data);
+    return copy;
+}
+
+
+function cloneQuestion(question) {
+    const copy = structuredClone(question);
+    const idMap = new Map();
+
+    function regenerateIds(value) {
+        if (Array.isArray(value)) {
+            value.forEach(regenerateIds);
+            return;
+        }
+        if (!value || typeof value !== "object") return;
+
+        if (typeof value.id === "string" && value.id) {
+            const oldId = value.id;
+            const prefix = oldId.split("_")[0] || "id";
+            const newId = createId(prefix);
+            idMap.set(oldId, newId);
+            value.id = newId;
+        }
+
+        Object.values(value).forEach(regenerateIds);
+    }
+
+    function remapReferences(value) {
+        if (Array.isArray(value)) {
+            value.forEach(remapReferences);
+            return;
+        }
+        if (!value || typeof value !== "object") return;
+
+        if (value.matchingConnections && typeof value.matchingConnections === "object" && !Array.isArray(value.matchingConnections)) {
+            const remapped = {};
+            for (const [left, right] of Object.entries(value.matchingConnections)) {
+                const newLeft = idMap.get(left) || left;
+                const newRight = idMap.get(String(right)) || right;
+                remapped[newLeft] = newRight;
+            }
+            value.matchingConnections = remapped;
+        }
+
+        Object.values(value).forEach(remapReferences);
+    }
+
+    regenerateIds(copy);
+    remapReferences(copy);
+    copy.attempts = 0;
+    copy.correct = 0;
+    copy.lastPractice = null;
+    ns.normalizeQuestion(copy);
     return copy;
 }
 

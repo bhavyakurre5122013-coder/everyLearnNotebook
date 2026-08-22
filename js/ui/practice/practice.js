@@ -7,22 +7,6 @@
     const scoreForQuestion = (...args) => ns.scoreForQuestion(...args);
     const showToast = (...args) => ns.showToast(...args);
 
-    const resetPracticeSession = (...args) => ns.resetPracticeSession(...args);
-
-    function syncPracticeSession(sourceQuestions) {
-        const scopeKey = `${state.notebookId || ""}:${state.topicId || ""}`;
-        const questionSetKey = sourceQuestions
-            .map(question => question.id)
-            .sort()
-            .join("|");
-
-        if (state.practice.scopeKey !== scopeKey || state.practice.questionSetKey !== questionSetKey) {
-            resetPracticeSession();
-            state.practice.scopeKey = scopeKey;
-            state.practice.questionSetKey = questionSetKey;
-        }
-    }
-
     function renderPractice() {
         const mode = document.getElementById("practiceMode");
         if (!mode) return;
@@ -33,7 +17,6 @@
         mode.classList.remove("hidden");
 
         const sourceQuestions = listQuestions(state.notebookId, state.topicId);
-        syncPracticeSession(sourceQuestions);
         const questions = getPracticeQuestions(sourceQuestions);
         if (!questions.length) {
             mode.innerHTML = `
@@ -184,30 +167,37 @@
 
     function renderFeedback(question, result) {
         if (!result) return "";
-        const correct = result.correct;
+        const status = result.status || (result.correct ? "correct" : "incorrect");
+        const title = status === "correct" ? "Correct" : status === "partial" ? "Partially correct" : status === "unanswered" ? "Not answered" : "Not correct";
+        const className = status === "correct" ? "correct" : status === "partial" ? "info" : "incorrect";
         return `
-            <div class="practice-feedback ${correct ? "correct" : "incorrect"}">
-                <div class="practice-feedback-title">${correct ? "Correct" : "Not correct"}</div>
+            <div class="practice-feedback ${className}">
+                <div class="practice-feedback-title">${title}</div>
                 <div>Score: ${result.scoreDisplay}</div>
-                ${!correct ? `<div class="practice-feedback-corrections">${renderCorrectionSummary(result)}</div>` : ""}
+                ${status !== "correct" ? `<div class="practice-feedback-corrections">${renderCorrectionSummary(result)}</div>` : ""}
             </div>
         `;
     }
 
     function renderCorrectionSummary(result) {
         const parts = [];
+        if (result.status === "unanswered") {
+            parts.push(`<div><strong>No answer was provided.</strong></div>`);
+        }
         if (result.expectedTokens?.length || result.receivedTokens?.length) {
             const expected = result.expectedTokens || [];
             const received = result.receivedTokens || [];
             parts.push(`<div class="checking-diff-grid"><div><span>Correct answer</span><div class="checking-diff-text">${expected.map(item => `<span class="checking-token ${item.status}">${escapeHTML(item.token)}</span>`).join(" ")}</div></div><div><span>Your answer</span><div class="checking-diff-text">${received.map(item => `<span class="checking-token ${item.status}">${escapeHTML(item.token)}</span>`).join(" ")}</div></div></div>`);
         }
-        if (result.missing?.length) parts.push(`<div><strong>Missing:</strong> ${escapeHTML(result.missing.join(" "))}</div>`);
-        if (result.extra?.length) parts.push(`<div><strong>Extra:</strong> ${escapeHTML(result.extra.join(" "))}</div>`);
-        if (result.spellingErrors?.length) parts.push(`<div><strong>Spelling:</strong> ${result.spellingErrors.map(item => `${escapeHTML(item.received)} → ${escapeHTML(item.expected)}`).join(", ")}</div>`);
-        if (result.punctuationErrors?.length) parts.push(`<div><strong>Punctuation:</strong> ${result.punctuationErrors.length} issue${result.punctuationErrors.length === 1 ? "" : "s"}</div>`);
+        if (result.missing?.length) parts.push(`<div><strong>Missing:</strong> ${escapeHTML(result.missing.join(", "))}</div>`);
+        if (result.extra?.length) parts.push(`<div><strong>Extra:</strong> ${escapeHTML(result.extra.join(", "))}</div>`);
         if (result.points?.length) {
             const partial = result.points.filter(item => item.score < 1).length;
             if (partial) parts.push(`<div><strong>Required points:</strong> ${partial} incomplete</div>`);
+        }
+        if (result.details?.length) {
+            const incomplete = result.details.filter(item => !item.correct).length;
+            if (incomplete) parts.push(`<div><strong>Subquestions:</strong> ${incomplete} incomplete</div>`);
         }
         return parts.join("");
     }
@@ -364,14 +354,6 @@
         };
     }
 
-    function emptyAnswer(question) {
-        if (["text", "difference"].includes(question.type)) return { text: "" };
-        if (question.type === "trueFalse") return { value: "" };
-        if (["singleCorrect", "multipleCorrect", "fill"].includes(question.type)) return { values: [] };
-        if (question.type === "caseBased") return { values: {} };
-        return {};
-    }
-
     function statusLabel(status) {
         return status === "given" ? "Given" : status === "seen" ? "Seen" : "Not seen";
     }
@@ -435,39 +417,115 @@
     }
 
     function collectAnswer(mode, question) {
-        if (["text", "difference"].includes(question.type)) return { text: mode.querySelector("[data-text-answer]")?.value || "" };
-        if (question.type === "trueFalse") return { value: mode.querySelector("input[name='practice-answer']:checked")?.value || "" };
-        if (["singleCorrect", "multipleCorrect"].includes(question.type)) return { values: [...mode.querySelectorAll("input[name='practice-answer']:checked")].map(input => input.value) };
-        if (question.type === "fill") return { values: [...mode.querySelectorAll("[data-fill-answer]")].map(input => input.value) };
-        if (question.type === "caseBased") return { values: Object.fromEntries([...mode.querySelectorAll("[data-case-answer]")].map(field => [field.dataset.caseAnswer, field.value])) };
+        return collectAnswerFromContainer(mode, question);
+    }
+
+    function collectAnswerFromContainer(container, question) {
+        if (question.type === "text") return { text: container.querySelector("[data-text-answer]")?.value || "" };
+        if (question.type === "difference") {
+            const values = {};
+            container.querySelectorAll("[data-difference-answer]").forEach(input => {
+                const [rowId, column] = input.dataset.differenceAnswer.split(":");
+                values[rowId] = values[rowId] || [];
+                values[rowId][Number(column)] = input.value || "";
+            });
+            return { values };
+        }
+        if (question.type === "trueFalse") return { value: container.querySelector("[data-true-false-answer]")?.value || "" };
+        if (question.type === "assertionReasoning") return { value: container.querySelector("[data-assertion-answer]")?.value || "" };
+        if (["singleCorrect", "multipleCorrect"].includes(question.type)) {
+            return { values: [...container.querySelectorAll("input[data-choice-answer]:checked")].map(input => input.value) };
+        }
+        if (question.type === "fill") return { values: [...container.querySelectorAll("[data-fill-answer]")].map(input => input.value || "") };
+        if (question.type === "ordering") return { values: [...container.querySelectorAll("[data-order-answer]")].map(select => select.value || "") };
+        if (question.type === "matching") {
+            const values = {};
+            container.querySelectorAll("[data-matching-answer]").forEach(select => { values[select.dataset.matchingAnswer] = select.value || ""; });
+            return { values };
+        }
+        if (question.type === "caseBased") {
+            const values = {};
+            question.caseQuestions?.forEach(sub => {
+                const host = container.querySelector(`[data-case-answer-container="${CSS.escape(sub.id)}"]`);
+                if (host) values[sub.id] = collectAnswerFromContainer(host, sub);
+            });
+            return { values };
+        }
+        return {};
+    }
+
+    function emptyAnswer(question) {
+        if (question.type === "text") return { text: "" };
+        if (question.type === "difference" || question.type === "matching" || question.type === "caseBased") return { values: {} };
+        if (["singleCorrect", "multipleCorrect", "fill", "ordering"].includes(question.type)) return { values: [] };
+        if (["trueFalse", "assertionReasoning"].includes(question.type)) return { value: "" };
         return {};
     }
 
     function renderAnswerControl(question, currentAnswer) {
-        if (question.type === "trueFalse") return `<div class="practice-choice-list"><label class="practice-choice"><input type="radio" name="practice-answer" value="true" ${currentAnswer?.value === "true" ? "checked" : ""}>True</label><label class="practice-choice"><input type="radio" name="practice-answer" value="false" ${currentAnswer?.value === "false" ? "checked" : ""}>False</label></div>`;
-        if (["singleCorrect", "multipleCorrect"].includes(question.type)) return `<div class="practice-choice-list">${(question.options || []).map(option => `<label class="practice-choice"><input type="${question.type === "singleCorrect" ? "radio" : "checkbox"}" name="practice-answer" value="${option.id}" ${(currentAnswer?.values || []).includes(option.id) ? "checked" : ""}>${escapeHTML(option.text)}</label>`).join("")}</div>`;
-        if (question.type === "fill") {
-            const count = (question.text.match(/\{\{blank\}\}/g) || []).length || 1;
-            return `<div class="stack">${Array.from({ length: count }, (_, index) => `<div class="inline-field"><span class="chip">Blank ${index + 1}</span><input class="field-input" data-fill-answer="${index}" value="${escapeHTML(currentAnswer?.values?.[index] || "")}" placeholder="Answer"></div>`).join("")}</div>`;
+        if (question.type === "trueFalse") {
+            return `<select class="field-select" data-true-false-answer><option value="">Choose an answer</option><option value="true" ${currentAnswer?.value === "true" ? "selected" : ""}>True</option><option value="false" ${currentAnswer?.value === "false" ? "selected" : ""}>False</option></select>`;
         }
-        if (question.type === "caseBased") return `<div class="practice-case"><div class="practice-case-passage">${escapeHTML(question.casePassage || "")}</div>${(question.caseQuestions || []).map(sub => `<div class="practice-subquestion"><div class="practice-subquestion-title">${escapeHTML(sub.text)}</div><textarea class="practice-answer-textarea" data-case-answer="${sub.id}" placeholder="Answer">${escapeHTML(currentAnswer?.values?.[sub.id] || "")}</textarea></div>`).join("")}</div>`;
+        if (question.type === "assertionReasoning") {
+            const options = [
+                ["a", "Both true; reason explains assertion"],
+                ["b", "Both true; reason does not explain assertion"],
+                ["c", "Assertion true; reason false"],
+                ["d", "Assertion false; reason true"]
+            ];
+            return `<select class="field-select" data-assertion-answer><option value="">Choose an answer</option>${options.map(([value, text]) => `<option value="${value}" ${currentAnswer?.value === value ? "selected" : ""}>${escapeHTML(text)}</option>`).join("")}</select>`;
+        }
+        if (["singleCorrect", "multipleCorrect"].includes(question.type)) {
+            return `<div class="practice-choice-list">${(question.options || []).map(option => `<label class="practice-choice"><input type="${question.type === "singleCorrect" ? "radio" : "checkbox"}" data-choice-answer name="practice-answer" value="${escapeHTML(option.id)}" ${(currentAnswer?.values || []).includes(option.id) ? "checked" : ""}>${escapeHTML(option.text)}</label>`).join("")}</div>`;
+        }
+        if (question.type === "fill") {
+            const count = (question.text.match(/\{\{blank\}\}/g) || []).length || (question.answerData?.blanks || []).length || 1;
+            return `<div class="stack">${Array.from({ length: count }, (_, index) => `<div class="inline-field"><span class="chip">Blank ${index + 1}</span><input class="field-input" data-fill-answer value="${escapeHTML(currentAnswer?.values?.[index] || "")}" placeholder="Answer"></div>`).join("")}</div>`;
+        }
+        if (question.type === "ordering") {
+            const current = currentAnswer?.values || [];
+            return `<div class="stack">${(question.orderItems || []).map((item, index) => `<div class="inline-field"><span class="chip">Position ${index + 1}</span><select class="field-select" data-order-answer><option value="">Choose item</option>${(question.orderItems || []).map(candidate => `<option value="${escapeHTML(candidate.id)}" ${current[index] === candidate.id ? "selected" : ""}>${escapeHTML(candidate.text)}</option>`).join("")}</select></div>`).join("")}</div>`;
+        }
+        if (question.type === "matching") {
+            const current = currentAnswer?.values || {};
+            const pairs = question.pairs || [];
+            return `<div class="stack">${pairs.map(pair => `<div class="inline-field"><span class="chip">${escapeHTML(pair.left)}</span><select class="field-select" data-matching-answer="${escapeHTML(pair.id)}"><option value="">Choose match</option>${pairs.map(candidate => `<option value="${escapeHTML(candidate.id)}" ${current[pair.id] === candidate.id ? "selected" : ""}>${escapeHTML(candidate.right)}</option>`).join("")}</select></div>`).join("")}</div>`;
+        }
+        if (question.type === "difference") {
+            const current = currentAnswer?.values || {};
+            const diff = question.difference || { terms: [], rows: [] };
+            return `<div class="stack"><table class="difference-table"><thead><tr><th>Aspect</th>${(diff.terms || []).map(term => `<th>${escapeHTML(term)}</th>`).join("")}</tr></thead><tbody>${(diff.rows || []).map(row => `<tr><td>${escapeHTML(row.aspect || "")}</td>${(row.values || []).map((_, index) => `<td><input class="table-input" data-difference-answer="${escapeHTML(row.id)}:${index}" value="${escapeHTML(current[row.id]?.[index] || "")}" placeholder="Answer"></td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+        }
+        if (question.type === "caseBased") {
+            const current = currentAnswer?.values || {};
+            return `<div class="practice-case"><div class="practice-case-passage">${escapeHTML(question.casePassage || "")}</div>${(question.caseQuestions || []).map((sub, index) => `<div class="practice-subquestion" data-case-answer-container="${escapeHTML(sub.id)}"><div class="practice-subquestion-title">Question ${index + 1}: ${escapeHTML(sub.text || label(sub.type))}</div>${renderAnswerControl(sub, current[sub.id])}</div>`).join("")}</div>`;
+        }
         return `<textarea class="practice-answer-textarea" data-text-answer placeholder="Type your answer...">${escapeHTML(currentAnswer?.text || "")}</textarea>`;
     }
 
-    function renderStoredAnswer(question, answer) {
-        if (!answer) return "—";
-        if (answer.text !== undefined) return escapeHTML(answer.text || "—").replaceAll("\n", "<br>");
-        if (answer.value !== undefined) return escapeHTML(answer.value || "—");
-        if (Array.isArray(answer.values)) return escapeHTML(answer.values.join(", ") || "—");
-        return "—";
-    }
-
     function renderCorrectAnswer(question) {
-        if (["text", "difference", "trueFalse"].includes(question.type)) return escapeHTML(question.answer || "—").replaceAll("\n", "<br>");
+        if (question.type === "text") return escapeHTML(question.answer || "—").replaceAll("\n", "<br>");
+        if (question.type === "trueFalse") return escapeHTML(question.answer || "—");
+        if (question.type === "assertionReasoning") return escapeHTML(question.answerData?.result || "—");
         if (question.type === "fill") return escapeHTML((question.answerData?.blanks || []).join(", "));
         if (["singleCorrect", "multipleCorrect"].includes(question.type)) return escapeHTML((question.options || []).filter(option => option.correct).map(option => option.text).join(", "));
-        if (question.type === "caseBased") return (question.caseQuestions || []).map(item => `<div>${escapeHTML(item.answer || "—")}</div>`).join("");
+        if (question.type === "ordering") return escapeHTML((question.orderItems || []).map(item => item.text).join(" → "));
+        if (question.type === "matching") return (question.pairs || []).map(pair => `<div>${escapeHTML(pair.left)} → ${escapeHTML((question.pairs || []).find(item => item.id === question.matchingConnections?.[pair.id])?.right || "—")}</div>`).join("");
+        if (question.type === "difference") return `<table class="difference-table"><tbody>${(question.difference?.rows || []).map(row => `<tr><td>${escapeHTML(row.aspect || "")}</td>${(row.values || []).map(value => `<td>${escapeHTML(value)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+        if (question.type === "caseBased") return (question.caseQuestions || []).map((item, index) => `<div><strong>${index + 1}.</strong> ${escapeHTML(renderNestedCorrectAnswer(item))}</div>`).join("");
         return escapeHTML(question.answer || "—");
+    }
+
+    function renderNestedCorrectAnswer(question) {
+        if (question.type === "text") return question.answer || "—";
+        if (question.type === "trueFalse") return question.answer || "—";
+        if (question.type === "assertionReasoning") return question.answerData?.result || "—";
+        if (question.type === "fill") return (question.answerData?.blanks || []).join(", ");
+        if (["singleCorrect", "multipleCorrect"].includes(question.type)) return (question.options || []).filter(option => option.correct).map(option => option.text).join(", ");
+        if (question.type === "ordering") return (question.orderItems || []).map(item => item.text).join(" → ");
+        if (question.type === "matching") return (question.pairs || []).map(pair => `${pair.left} → ${(question.pairs || []).find(item => item.id === question.matchingConnections?.[pair.id])?.right || "—"}`).join(", ");
+        if (question.type === "difference") return (question.difference?.rows || []).map(row => `${row.aspect || ""}: ${(row.values || []).join(" | ")}`).join("; ");
+        return question.answer || "—";
     }
 
     function label(type) {

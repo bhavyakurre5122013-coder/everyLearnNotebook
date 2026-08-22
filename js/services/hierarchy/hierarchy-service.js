@@ -61,6 +61,94 @@ function findTopicContext(notebookId, topicId) {
     return null;
 }
 
+function walkNotebookHierarchy(notebook, visitor) {
+    if (!notebook || typeof visitor !== "function") return;
+
+    for (const chapter of notebook.rootChapters || []) {
+        visitor({
+            type: "chapter",
+            notebook,
+            section: null,
+            chapter,
+            topic: null,
+            question: null,
+            root: true
+        });
+
+        for (const topic of chapter.topics || []) {
+            visitor({
+                type: "topic",
+                notebook,
+                section: null,
+                chapter,
+                topic,
+                question: null,
+                root: true
+            });
+
+            for (const question of topic.questions || []) {
+                visitor({
+                    type: "question",
+                    notebook,
+                    section: null,
+                    chapter,
+                    topic,
+                    question,
+                    root: true
+                });
+            }
+        }
+    }
+
+    for (const section of notebook.sections || []) {
+        visitor({
+            type: "section",
+            notebook,
+            section,
+            chapter: null,
+            topic: null,
+            question: null,
+            root: false
+        });
+
+        for (const chapter of section.chapters || []) {
+            visitor({
+                type: "chapter",
+                notebook,
+                section,
+                chapter,
+                topic: null,
+                question: null,
+                root: false
+            });
+
+            for (const topic of chapter.topics || []) {
+                visitor({
+                    type: "topic",
+                    notebook,
+                    section,
+                    chapter,
+                    topic,
+                    question: null,
+                    root: false
+                });
+
+                for (const question of topic.questions || []) {
+                    visitor({
+                        type: "question",
+                        notebook,
+                        section,
+                        chapter,
+                        topic,
+                        question,
+                        root: false
+                    });
+                }
+            }
+        }
+    }
+}
+
 function addSection(notebookId, name) {
     const notebook = requireNotebook(notebookId);
     const section = createSection(name);
@@ -312,6 +400,7 @@ function duplicateTopic(sourceNotebookId, topicId, destinationNotebookId, destin
     return copy;
 }
 
+    ns.walkNotebookHierarchy = walkNotebookHierarchy;
     ns.getSection = getSection;
     ns.getChapter = getChapter;
     ns.getTopic = getTopic;

@@ -35,12 +35,19 @@
         const editor = getEditor();
         const selection = window.getSelection();
         if (!editor || !selection) return;
-        if (!savedRange) {
+        if (!savedRange || !editor.contains(savedRange.commonAncestorContainer)) {
+            savedRange = null;
             editor.focus();
             return;
         }
         selection.removeAllRanges();
         selection.addRange(savedRange);
+    }
+
+    function resetSelection() {
+        savedRange = null;
+        const selection = window.getSelection();
+        if (selection) selection.removeAllRanges();
     }
 
     function selectEditorContents() {
@@ -127,20 +134,23 @@
         restoreSelection();
 
         const selection = window.getSelection();
-        if (!selection || !selection.rangeCount || selection.isCollapsed) {
+        if (!selection || !selection.rangeCount) return;
+
+        if (selection.isCollapsed) {
+            const range = selection.getRangeAt(0);
+            if (!editor.contains(range.commonAncestorContainer)) return;
             const node = document.createElement(tag);
             Object.assign(node.style, style);
             node.appendChild(document.createTextNode(""));
-            const range = document.createRange();
-            range.selectNodeContents(editor);
-            range.collapse(false);
             range.insertNode(node);
+
             const newRange = document.createRange();
-            newRange.setStart(node, 0);
+            newRange.setStart(node.firstChild, 0);
             newRange.collapse(true);
             selection.removeAllRanges();
             selection.addRange(newRange);
             saveSelection();
+            editor.dispatchEvent(new Event("input", { bubbles: true }));
             return;
         }
 
@@ -215,8 +225,9 @@
     function applyCase(mode) {
         const editor = getEditor();
         const selection = window.getSelection();
-        if (!editor || !selection || !selection.rangeCount) return;
+        if (!editor || !selection) return;
         restoreSelection();
+        if (!selection.rangeCount || !editor.contains(selection.anchorNode)) return;
 
         let text = selection.toString();
         if (!text) return;
@@ -274,30 +285,68 @@
     }
 
     async function copySelection() {
-        const text = getSelectedText();
-        if (!text) return;
+        const editor = getEditor();
+        if (!editor || !getSelectedText()) return;
+        editor.focus();
+        restoreSelection();
         try {
-            await navigator.clipboard.writeText(text);
+            document.execCommand("copy");
         } catch {
-            exec("copy");
+            try {
+                await navigator.clipboard.writeText(getSelectedText());
+            } catch {
+                return;
+            }
         }
+        saveSelection();
     }
 
     async function cutSelection() {
+        const editor = getEditor();
+        if (!editor || !getSelectedText()) return;
+        editor.focus();
+        restoreSelection();
         try {
-            await navigator.clipboard.writeText(getSelectedText());
-            exec("delete");
+            document.execCommand("cut");
         } catch {
-            exec("cut");
+            try {
+                await navigator.clipboard.writeText(getSelectedText());
+                document.execCommand("delete");
+            } catch {
+                return;
+            }
         }
+        saveSelection();
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
     async function pasteClipboard() {
+        const editor = getEditor();
+        if (!editor) return;
+        editor.focus();
+        restoreSelection();
+
         try {
+            if (navigator.clipboard?.read) {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    if (item.types.includes("text/html")) {
+                        const blob = await item.getType("text/html");
+                        insertHTML(await blob.text());
+                        return;
+                    }
+                }
+            }
             const text = await navigator.clipboard.readText();
             if (text) insertTextAtCursor(text);
         } catch {
-            window.alert("Clipboard access is unavailable here. Use Ctrl+V to paste.");
+            try {
+                document.execCommand("paste");
+                saveSelection();
+                editor.dispatchEvent(new Event("input", { bubbles: true }));
+            } catch {
+                window.alert("Clipboard access is unavailable here. Use Ctrl+V to paste.");
+            }
         }
     }
 
@@ -320,6 +369,7 @@
         focusNotesEditor,
         saveSelection,
         restoreSelection,
+        resetSelection,
         selectEditorContents,
         exec,
         insertHTML,

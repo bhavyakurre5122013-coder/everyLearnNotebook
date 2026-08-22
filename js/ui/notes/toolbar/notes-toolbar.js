@@ -182,11 +182,11 @@
     }
 
     function attachToolbarEvents(toolbar) {
-        toolbar.addEventListener("mousedown", event => {
+        toolbar.onmousedown = event => {
             if (event.target.closest("button, select, input")) {
                 api().saveSelection();
             }
-        });
+        };
 
         toolbar.onchange = event => {
             const target = event.target;

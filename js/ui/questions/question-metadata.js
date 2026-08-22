@@ -1,12 +1,6 @@
 (function(ns){
     "use strict";
 
-    const state = ns.state;
-    const setQuestionImportance = (...args) => ns.setQuestionImportance(...args);
-    const setQuestionFavorite = (...args) => ns.setQuestionFavorite(...args);
-    const setQuestionBookmark = (...args) => ns.setQuestionBookmark(...args);
-    const updateQuestion = (...args) => ns.updateQuestion(...args);
-
     function renderQuestionMetadata(question) {
         const mount = document.getElementById("questionMetadata");
         if (!mount) return;
@@ -61,17 +55,23 @@
             <div class="question-notes-host" data-question-notes-host></div>
         `;
 
-        const refreshMetadata = updatedQuestion => renderQuestionMetadata(updatedQuestion || question);
-
         mount.querySelectorAll("[data-importance]").forEach(button => {
             button.onclick = () => {
-                const updated = setQuestionImportance(state.notebookId, state.topicId, question.id, Number(button.dataset.importance));
-                refreshMetadata(updated);
+                question.important = Number(button.dataset.importance);
+                renderQuestionMetadata(question);
             };
         });
-        mount.querySelector("[data-question-favorite]").onclick = () => refreshMetadata(setQuestionFavorite(state.notebookId, state.topicId, question.id, !favorite));
-        mount.querySelector("[data-question-bookmark]").onclick = () => refreshMetadata(setQuestionBookmark(state.notebookId, state.topicId, question.id, !bookmarked));
-        mount.querySelector("[data-question-difficulty]").onchange = event => updateQuestion(state.notebookId, state.topicId, question.id, { difficulty: Number(event.target.value) });
+        mount.querySelector("[data-question-favorite]").onclick = () => {
+            question.favorite = !question.favorite;
+            renderQuestionMetadata(question);
+        };
+        mount.querySelector("[data-question-bookmark]").onclick = () => {
+            question.bookmarked = !question.bookmarked;
+            renderQuestionMetadata(question);
+        };
+        mount.querySelector("[data-question-difficulty]").onchange = event => {
+            question.difficulty = Number(event.target.value);
+        };
 
         mount.querySelector("[data-question-notes]").onclick = () => toggleNotesEditor(mount, question);
         mount.querySelector("[data-question-checking]").onclick = () => {
@@ -99,17 +99,15 @@
             </div>
         `;
         const input = host.querySelector("[data-note-input]");
-        const persist = () => {
-            updateQuestion(state.notebookId, state.topicId, question.id, { notes: input.value.trim() });
-            const latest = ns.getQuestion(state.notebookId, state.topicId, question.id);
-            renderQuestionMetadata(latest || { ...question, notes: input.value.trim() });
+        const persistDraft = () => {
+            question.notes = input.value.trim();
+            renderQuestionMetadata(question);
         };
-        host.querySelector("[data-note-add]").onclick = persist;
-        host.querySelector("[data-note-save]").onclick = persist;
+        host.querySelector("[data-note-add]").onclick = persistDraft;
+        host.querySelector("[data-note-save]").onclick = persistDraft;
         host.querySelector("[data-note-delete]").onclick = () => {
-            updateQuestion(state.notebookId, state.topicId, question.id, { notes: "" });
-            const latest = ns.getQuestion(state.notebookId, state.topicId, question.id);
-            renderQuestionMetadata(latest || { ...question, notes: "" });
+            question.notes = "";
+            renderQuestionMetadata(question);
         };
     }
 

@@ -2,6 +2,7 @@
     "use strict";
 
     const state = ns.state;
+    const walkNotebookHierarchy = (...args) => ns.walkNotebookHierarchy(...args);
 
     /* everyLearnNotebook — Search Service */
 
@@ -13,6 +14,17 @@
         const template = document.createElement("template");
         template.innerHTML = String(value || "");
         return template.content.textContent || "";
+    }
+
+    function makePath(notebook, section, chapter, topic) {
+        return [
+            notebook?.name,
+            section?.name,
+            chapter?.name,
+            topic?.name
+        ]
+            .filter(Boolean)
+            .join(" / ");
     }
 
     function searchEverything(query) {
@@ -35,8 +47,7 @@
         }
 
         for (const notebook of state.data.notebooks) {
-            const notebookText =
-                `${notebook.name} ${notebook.description}`;
+            const notebookText = `${notebook.name} ${notebook.description}`;
 
             if (normalize(notebookText).includes(q)) {
                 results.push({
@@ -48,18 +59,47 @@
                 });
             }
 
-            const visitChapter = (chapter, section = null) => {
-                for (const topic of chapter.topics || []) {
-                    const questionText =
-                        (topic.questions || [])
-                            .map(question => question.text)
-                            .join(" ");
+            walkNotebookHierarchy(notebook, ({
+                type,
+                section,
+                chapter,
+                topic,
+                question
+            }) => {
+                if (type === "section") {
+                    if (normalize(section.name).includes(q)) {
+                        results.push({
+                            type: "section",
+                            title: section.name,
+                            notebookId: notebook.id,
+                            sectionId: section.id,
+                            topicId: null,
+                            path: makePath(notebook, section, null, null)
+                        });
+                    }
+                    return;
+                }
 
+                if (type === "chapter") {
+                    if (normalize(chapter.name).includes(q)) {
+                        results.push({
+                            type: "chapter",
+                            title: chapter.name,
+                            notebookId: notebook.id,
+                            sectionId: section?.id || null,
+                            chapterId: chapter.id,
+                            topicId: null,
+                            path: makePath(notebook, section, chapter, null)
+                        });
+                    }
+                    return;
+                }
+
+                if (type === "topic") {
                     const text = normalize(
                         [
                             topic.name,
-                            stripHTML(topic.notes),
-                            questionText
+                            stripHTML(topic.notes)
                         ].join(" ")
                     );
 
@@ -68,29 +108,37 @@
                             type: "topic",
                             title: topic.name,
                             notebookId: notebook.id,
+                            sectionId: section?.id || null,
+                            chapterId: chapter.id,
                             topicId: topic.id,
-                            path: [
-                                notebook.name,
-                                section?.name,
-                                chapter.name,
-                                topic.name
-                            ]
-                                .filter(Boolean)
-                                .join(" / ")
+                            path: makePath(notebook, section, chapter, topic)
+                        });
+                    }
+                    return;
+                }
+
+                if (type === "question") {
+                    const text = normalize(
+                        [
+                            question.text,
+                            stripHTML(question.notes)
+                        ].join(" ")
+                    );
+
+                    if (text.includes(q)) {
+                        results.push({
+                            type: "question",
+                            title: question.text || "Untitled question",
+                            notebookId: notebook.id,
+                            sectionId: section?.id || null,
+                            chapterId: chapter.id,
+                            topicId: topic.id,
+                            questionId: question.id,
+                            path: makePath(notebook, section, chapter, topic)
                         });
                     }
                 }
-            };
-
-            for (const chapter of notebook.rootChapters || []) {
-                visitChapter(chapter, null);
-            }
-
-            for (const section of notebook.sections || []) {
-                for (const chapter of section.chapters || []) {
-                    visitChapter(chapter, section);
-                }
-            }
+            });
         }
 
         return results.slice(0, 100);

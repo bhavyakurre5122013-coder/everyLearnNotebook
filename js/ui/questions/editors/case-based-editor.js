@@ -2,6 +2,8 @@
     "use strict";
 
     const createId = (...args) => ns.createId(...args);
+    const createQuestion = (...args) => ns.createQuestion(...args);
+    const prepareQuestionForType = (...args) => ns.prepareQuestionForType(...args);
     const renderTextEditor = (...args) => ns.renderTextEditor(...args);
     const renderFillEditor = (...args) => ns.renderFillEditor(...args);
     const renderTrueFalseEditor = (...args) => ns.renderTrueFalseEditor(...args);
@@ -128,27 +130,9 @@
     }
 
     function createCaseSubquestion() {
-        return {
-            id: createId("caseq"),
-            type: "text",
-            text: "",
-            answer: "",
-            difficulty: 1,
-            important: 0,
-            favorite: false,
-            bookmarked: false,
-            hints: [],
-            options: [],
-            answerData: {},
-            pairs: [],
-            matchingConnections: {},
-            orderItems: [],
-            difference: {
-                termCount: 2,
-                terms: ["", ""],
-                rows: []
-            }
-        };
+        const sub = createQuestion("text");
+        sub.id = createId("caseq");
+        return sub;
     }
 
     function renderSubquestion(sub, index) {
@@ -296,7 +280,7 @@
 
                 if (!sub) return;
 
-                sub.type = select.value;
+                prepareQuestionForType(sub, select.value);
 
                 renderCaseEditor(
                     mount,

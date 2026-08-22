@@ -1,27 +1,25 @@
 (function(ns){
     "use strict";
-/* everyLearn — Autosave */
-let timer = null;
 
-function scheduleAutosave(
-    saveFunction,
-    delay = 600
-) {
-    clearTimeout(timer);
+    let timer = null;
+    let sequence = 0;
 
-    timer = setTimeout(
-        () => {
-            saveFunction();
+    function scheduleAutosave(saveFunction, delay = 600) {
+        clearTimeout(timer);
+        const currentSequence = ++sequence;
+
+        timer = setTimeout(() => {
             timer = null;
-        },
-        delay
-    );
-}
+            if (currentSequence !== sequence) return;
+            saveFunction();
+        }, delay);
+    }
 
-function cancelAutosave() {
-    clearTimeout(timer);
-    timer = null;
-}
+    function cancelAutosave() {
+        clearTimeout(timer);
+        timer = null;
+        sequence += 1;
+    }
 
     ns.scheduleAutosave = scheduleAutosave;
     ns.cancelAutosave = cancelAutosave;

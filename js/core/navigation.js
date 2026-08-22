@@ -45,10 +45,10 @@ function openWorkspace(notebookId, topicId = null) {
     state.chapterId = null;
     state.topicId = topicId;
     state.subjectPageId = null;
-    ns.resetPracticeSession();
-    state.practice.scopeKey = null;
-    state.practice.questionSetKey = null;
+    state.practice.index = 0;
     state.editingQuestionId = null;
+    state.editingQuestionDraft = null;
+    state.editingQuestionIsNew = false;
 }
 
 function isHome() {

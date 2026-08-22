@@ -30,6 +30,8 @@ const state = {
     questionMode: "manage",
 
     editingQuestionId: null,
+    editingQuestionDraft: null,
+    editingQuestionIsNew: false,
 
     practice: {
         index: 0,
@@ -44,9 +46,7 @@ const state = {
         exerciseComplete: false,
         answerDisplayMode: "after-each",
         orderIds: [],
-        exerciseStatus: {},
-        scopeKey: null,
-        questionSetKey: null
+        exerciseStatus: {}
     },
 
     ui: {
@@ -63,32 +63,17 @@ const state = {
     }
 };
 
-function resetPracticeSession() {
-    if (state.practice.timerId) {
-        clearInterval(state.practice.timerId);
-    }
-    state.practice.index = 0;
-    state.practice.answers = {};
-    state.practice.results = {};
-    state.practice.orderIds = [];
-    state.practice.exerciseStatus = {};
-    state.practice.exerciseComplete = false;
-    state.practice.seconds = 0;
-    state.practice.timerId = null;
-}
-
 function resetWorkspaceSelection() {
     state.notebookId = null;
     state.sectionId = null;
     state.chapterId = null;
     state.topicId = null;
     state.editingQuestionId = null;
-    resetPracticeSession();
-    state.practice.scopeKey = null;
-    state.practice.questionSetKey = null;
+    state.editingQuestionDraft = null;
+    state.editingQuestionIsNew = false;
+    state.practice.index = 0;
 }
 
-    ns.resetPracticeSession = resetPracticeSession;
     ns.resetWorkspaceSelection = resetWorkspaceSelection;
     ns.state = state;
 })(window.everyLearn);
