@@ -23,7 +23,8 @@ function renderQuestionTypeSelector(question) {
 
     mount.querySelector("[data-question-type]").onchange = event => {
         prepareQuestionForType(question, event.target.value);
-        ns.renderQuestionType(question);
+        const editorMount = document.getElementById("questionTypeEditorMount");
+        if (editorMount) ns.renderQuestionTypeEditor(editorMount, question);
     };
 }
 

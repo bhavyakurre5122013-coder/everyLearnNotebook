@@ -45,5 +45,5 @@ function renderQuestionType(
     );
 }
 
-    ns.renderQuestionType = renderQuestionType;
+    ns.renderQuestionTypeEditor = renderQuestionType;
 })(window.everyLearn);

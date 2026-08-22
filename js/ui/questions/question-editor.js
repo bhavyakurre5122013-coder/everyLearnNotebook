@@ -9,7 +9,7 @@
     const renderQuestionTypeSelector = (...args) => ns.renderQuestionTypeSelector(...args);
     const renderQuestionMetadata = (...args) => ns.renderQuestionMetadata(...args);
     const renderQuestionHints = (...args) => ns.renderQuestionHints(...args);
-    const renderQuestionTypeRenderer = (...args) => ns.renderQuestionType(...args);
+    const renderQuestionTypeRenderer = (...args) => ns.renderQuestionTypeEditor(...args);
     const normalizeQuestion = (...args) => ns.normalizeQuestion(...args);
 
     function renderQuestionEditor() {
