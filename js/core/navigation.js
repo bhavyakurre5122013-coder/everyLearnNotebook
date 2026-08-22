@@ -41,6 +41,8 @@ function openSubjectPage(subjectId) {
 function openWorkspace(notebookId, topicId = null) {
     state.route = ROUTES.WORKSPACE;
     state.notebookId = notebookId;
+    state.sectionId = null;
+    state.chapterId = null;
     state.topicId = topicId;
     state.subjectPageId = null;
     state.practice.index = 0;

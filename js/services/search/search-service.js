@@ -82,7 +82,7 @@
                 }
             };
 
-            for (const chapter of notebook.chapters || []) {
+            for (const chapter of notebook.rootChapters || []) {
                 visitChapter(chapter, null);
             }
 

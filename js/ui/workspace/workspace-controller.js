@@ -19,10 +19,8 @@
 
 
 function initWorkspace() {
-    document.addEventListener(
-        "everylearn:render",
-        renderWorkspace
-    );
+    // Workspace rendering is coordinated by app/bootstrap.js so the home
+    // and workspace views are rendered together from one render event.
 }
 
 function renderWorkspace() {
