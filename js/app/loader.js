@@ -65,6 +65,7 @@ everyLearnNotebook — classic-script loader
     "js/ui/home-cards/subject-grid.js",
     "js/ui/home-cards/notebook-grid.js",
     "js/ui/home-cards/create-subject-card.js",
+    "js/ui/home/library-controls.js",
     "js/ui/shell/menu.js",
     "js/ui/shell/account.js",
     "js/ui/shell/ribbon.js",

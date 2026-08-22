@@ -10,6 +10,7 @@
     const searchEverything = (...args) => ns.searchEverything(...args);
     const openBookmarkEditor = (...args) => ns.openBookmarkEditor(...args);
     const openBookmarkBrowser = (...args) => ns.openBookmarkBrowser(...args);
+    const openBookmarksPage = (...args) => ns.openBookmarksPage(...args);
 /*
 =============================================================
 everyLearn — Application Menu
@@ -244,7 +245,8 @@ async function handleAction(action) {
             break;
 
         case "bookmarks":
-            openBookmarkBrowser();
+            openBookmarksPage();
+            document.dispatchEvent(new Event("everylearn:render"));
             break;
 
         case "filters":

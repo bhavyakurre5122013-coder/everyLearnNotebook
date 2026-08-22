@@ -36,6 +36,7 @@
 
     <!-- Layout and reusable components -->
     <link rel="stylesheet" href="./css/layout/layout.css">
+    <link rel="stylesheet" href="./css/home/home.css">
     <link rel="stylesheet" href="./css/workspace/workspace-tree.css">
     <link rel="stylesheet" href="./css/components/components.css">
     <link rel="stylesheet" href="./css/components/cards.css">
@@ -223,6 +224,7 @@
                             </p>
                         </div>
 
+                        <div id="subjectsControls" class="section-controls"></div>
                     </div>
 
 
@@ -265,6 +267,7 @@
                             </p>
                         </div>
 
+                        <div id="notebooksControls" class="section-controls"></div>
                     </div>
 
 
@@ -282,6 +285,38 @@
 
                 </section>
 
+            </section>
+
+
+            <!-- =============================================
+                 BOOKMARKS VIEW
+                 Top-level library for saved notebook locations.
+            ============================================== -->
+
+            <section
+                id="bookmarksView"
+                class="view bookmarks-view hidden"
+                aria-labelledby="bookmarksTitle"
+            >
+                <div class="view-header">
+                    <div>
+                        <h1 id="bookmarksTitle">Bookmarks</h1>
+                        <p id="bookmarksSubtitle">Saved locations across your notebooks.</p>
+                    </div>
+                    <div id="bookmarksHeaderActions" class="view-header-actions"></div>
+                </div>
+
+                <section id="bookmarksSection" class="home-section" aria-labelledby="bookmarksHeading">
+                    <div class="section-header">
+                        <div>
+                            <h2 id="bookmarksHeading">All bookmarks</h2>
+                            <p id="bookmarksDescription" class="section-description">Open, organize, or remove saved locations.</p>
+                        </div>
+                        <div id="bookmarksControls" class="section-controls"></div>
+                    </div>
+
+                    <div id="bookmarkGrid" class="card-grid bookmark-grid"></div>
+                </section>
             </section>
 
 

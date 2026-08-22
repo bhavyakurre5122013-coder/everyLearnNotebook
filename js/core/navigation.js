@@ -38,6 +38,12 @@ function openSubjectPage(subjectId) {
     resetWorkspaceSelection();
 }
 
+function openBookmarksPage() {
+    state.route = ROUTES.BOOKMARKS;
+    state.subjectPageId = null;
+    resetWorkspaceSelection();
+}
+
 function openWorkspace(notebookId, topicId = null) {
     state.route = ROUTES.WORKSPACE;
     state.notebookId = notebookId;
@@ -71,6 +77,7 @@ function setQuestionMode(mode) {
     ns.openSubjectsPage = openSubjectsPage;
     ns.openNotebooksPage = openNotebooksPage;
     ns.openSubjectPage = openSubjectPage;
+    ns.openBookmarksPage = openBookmarksPage;
     ns.openWorkspace = openWorkspace;
     ns.isHome = isHome;
     ns.isWorkspace = isWorkspace;

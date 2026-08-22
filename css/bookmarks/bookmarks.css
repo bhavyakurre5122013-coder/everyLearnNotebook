@@ -109,3 +109,69 @@ Purpose:
     border-color: var(--color-primary-border);
     background: var(--color-primary-soft);
 }
+
+.bookmarks-view .section-header {
+    align-items: flex-start;
+}
+
+.bookmark-grid {
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+}
+
+.bookmark-card {
+    position: relative;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-7);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition:
+        transform var(--duration-normal) var(--ease-standard),
+        box-shadow var(--duration-normal) var(--ease-standard),
+        border-color var(--duration-normal) var(--ease-standard);
+}
+
+.bookmark-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-md);
+}
+
+.bookmark-library-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.bookmark-library-icon {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    color: var(--color-bookmark);
+    background: var(--color-surface-soft);
+}
+
+.bookmark-library-icon img {
+    width: 20px;
+    height: 20px;
+}
+
+.bookmark-card .card-footer {
+    padding-top: var(--space-5);
+}
+
+.bookmark-card .delete-button {
+    flex: 0 0 auto;
+}
+
+.bookmark-card.library-detail-row {
+    min-height: 72px;
+}

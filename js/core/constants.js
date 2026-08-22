@@ -71,6 +71,7 @@ const ROUTES = {
     SUBJECTS: "subjects",
     NOTEBOOKS: "notebooks",
     SUBJECT: "subject",
+    BOOKMARKS: "bookmarks",
     WORKSPACE: "workspace"
 };
 

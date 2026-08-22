@@ -26,6 +26,13 @@ const state = {
     homeSubjectFilterId: null,
     subjectPageId: null,
 
+    library: {
+        subjects: { query: "", view: "grid", sort: "date-latest" },
+        notebooks: { query: "", view: "grid", sort: "date-latest" },
+        "subject-notebooks": { query: "", view: "grid", sort: "date-latest" },
+        bookmarks: { query: "", view: "grid", sort: "date-latest" }
+    },
+
     mainTab: "notes",
     questionMode: "manage",
 

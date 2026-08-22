@@ -5,120 +5,206 @@
     const findTopicContext = (...args) => ns.findTopicContext(...args);
     const createLocationBookmark = (...args) => ns.createLocationBookmark(...args);
     const openDialog = (...args) => ns.openDialog(...args);
+    const listNotebooks = (...args) => ns.listNotebooks(...args);
+    const walkNotebookHierarchy = (...args) => ns.walkNotebookHierarchy(...args);
+    const showToast = (...args) => ns.showToast(...args);
 
     /* everyLearnNotebook — Bookmark Editor */
 
-    function openBookmarkEditor() {
-        const context = findTopicContext(
-            state.notebookId,
-            state.topicId
-        );
+    function openBookmarkEditor(options = {}) {
+        if (options.libraryMode) {
+            return openLibraryBookmarkEditor();
+        }
 
-        if (!context) return;
+        const context = findTopicContext(state.notebookId, state.topicId);
+        if (!context) {
+            showToast({
+                message: "Open a topic before creating a bookmark.",
+                type: "error"
+            });
+            return;
+        }
 
+        openDialog({
+            title: "Create bookmark",
+            bodyHTML: renderTopicBookmarkForm(context),
+            footerHTML: `
+                <button class="secondary-button" data-dialog-cancel>Cancel</button>
+                <button class="create-button" data-dialog-save>＋ Create bookmark</button>
+            `,
+            onOpen: ({ host, close }) => {
+                host.querySelector("[data-dialog-cancel]").onclick = close;
+                host.querySelector("[data-dialog-save]").onclick = () => {
+                    const level = host.querySelector("#bookmarkLevel").value;
+                    createLocationBookmark({
+                        name: host.querySelector("#bookmarkName").value.trim() || context.topic.name,
+                        notebookId: context.notebook.id,
+                        sectionId: level === "section" ? context.section?.id || null : null,
+                        chapterId: ["chapter", "topic"].includes(level) ? context.chapter.id : null,
+                        topicId: level === "topic" ? context.topic.id : null
+                    });
+                    close();
+                    showToast({ message: "Bookmark created.", type: "success" });
+                };
+            }
+        });
+    }
+
+    function openLibraryBookmarkEditor() {
+        const locations = collectBookmarkLocations();
+        if (!locations.length) {
+            showToast({ message: "Create a notebook before creating a bookmark.", type: "error" });
+            return;
+        }
+
+        const first = locations[0];
         openDialog({
             title: "Create bookmark",
             bodyHTML: `
                 <div class="stack">
-
                     <div class="form-group">
-                        <label>
-                            Bookmark name
-                        </label>
-
-                        <input
-                            class="field-input"
-                            id="bookmarkName"
-                            value="${escapeHTML(context.topic.name)}"
-                        >
+                        <label for="bookmarkName">Bookmark name</label>
+                        <input class="field-input" id="bookmarkName" value="${escapeAttribute(first.name)}" placeholder="Bookmark name" data-auto-generated="true">
                     </div>
-
                     <div class="form-group">
-                        <label>
-                            Bookmark level
-                        </label>
-
-                        <select
-                            class="field-select"
-                            id="bookmarkLevel"
-                        >
-                            <option value="notebook">
-                                Notebook
-                            </option>
-                            ${
-                                context.section
-                                    ? `
-                                        <option value="section">
-                                            Section
-                                        </option>
-                                    `
-                                    : ""
-                            }
-                            <option value="chapter">
-                                Chapter
-                            </option>
-                            <option value="topic" selected>
-                                Topic
-                            </option>
+                        <label for="bookmarkLocation">Location</label>
+                        <select class="field-select" id="bookmarkLocation">
+                            ${locations.map(location => `
+                                <option value="${escapeAttribute(location.value)}" data-location-name="${escapeAttribute(location.name)}">
+                                    ${escapeHTML(location.label)}
+                                </option>
+                            `).join("")}
                         </select>
                     </div>
-
+                    <p class="form-help">A bookmark opens the selected notebook, section, chapter, or topic.</p>
                 </div>
             `,
             footerHTML: `
-                <button
-                    class="secondary-button"
-                    data-dialog-cancel
-                >
-                    Cancel
-                </button>
-
-                <button
-                    class="create-button"
-                    data-dialog-save
-                >
-                    ＋ Create bookmark
-                </button>
+                <button class="secondary-button" data-dialog-cancel>Cancel</button>
+                <button class="create-button" data-dialog-save>＋ Create bookmark</button>
             `,
             onOpen: ({ host, close }) => {
-                host.querySelector(
-                    "[data-dialog-cancel]"
-                ).onclick = close;
+                host.querySelector("[data-dialog-cancel]").onclick = close;
+                const name = host.querySelector("#bookmarkName");
+                const locationSelect = host.querySelector("#bookmarkLocation");
+                const selectedOption = () => locationSelect.selectedOptions[0];
 
-                host.querySelector(
-                    "[data-dialog-save]"
-                ).onclick = () => {
-                    const level =
-                        host.querySelector(
-                            "#bookmarkLevel"
-                        ).value;
+                locationSelect.onchange = () => {
+                    if (!name.value.trim() || name.dataset.autoGenerated === "true") {
+                        name.value = selectedOption()?.dataset.locationName || "Bookmark";
+                        name.dataset.autoGenerated = "true";
+                    }
+                };
 
+                name.oninput = () => {
+                    name.dataset.autoGenerated = "false";
+                };
+
+                host.querySelector("[data-dialog-save]").onclick = () => {
+                    const location = locations.find(item => item.value === locationSelect.value);
+                    if (!location) return;
+
+                    const cleanName = name.value.trim() || location.name;
                     createLocationBookmark({
-                        name:
-                            host.querySelector(
-                                "#bookmarkName"
-                            ).value.trim() ||
-                            context.topic.name,
-                        notebookId:
-                            context.notebook.id,
-                        sectionId:
-                            level === "section"
-                                ? context.section?.id || null
-                                : null,
-                        chapterId:
-                            ["chapter", "topic"].includes(level)
-                                ? context.chapter.id
-                                : null,
-                        topicId:
-                            level === "topic"
-                                ? context.topic.id
-                                : null
+                        name: cleanName,
+                        notebookId: location.notebookId,
+                        sectionId: location.sectionId,
+                        chapterId: location.chapterId,
+                        topicId: location.topicId
                     });
 
                     close();
+                    showToast({ message: "Bookmark created.", type: "success" });
+                    document.dispatchEvent(new Event("everylearn:render"));
                 };
             }
         });
+    }
+
+    function collectBookmarkLocations() {
+        const locations = [];
+
+        for (const notebook of listNotebooks()) {
+            locations.push({
+                value: encodeLocation(notebook.id),
+                label: `Notebook · ${notebook.name}`,
+                name: notebook.name,
+                notebookId: notebook.id,
+                sectionId: null,
+                chapterId: null,
+                topicId: null
+            });
+
+            walkNotebookHierarchy(notebook, context => {
+                if (context.type === "section") {
+                    locations.push({
+                        value: encodeLocation(notebook.id, context.section.id),
+                        label: `Section · ${notebook.name} / ${context.section.name}`,
+                        name: context.section.name,
+                        notebookId: notebook.id,
+                        sectionId: context.section.id,
+                        chapterId: null,
+                        topicId: null
+                    });
+                    return;
+                }
+
+                if (context.type === "chapter") {
+                    locations.push({
+                        value: encodeLocation(notebook.id, context.section?.id || null, context.chapter.id),
+                        label: `Chapter · ${buildPath(notebook.name, context.section?.name, context.chapter.name)}`,
+                        name: context.chapter.name,
+                        notebookId: notebook.id,
+                        sectionId: context.section?.id || null,
+                        chapterId: context.chapter.id,
+                        topicId: null
+                    });
+                    return;
+                }
+
+                if (context.type === "topic") {
+                    locations.push({
+                        value: encodeLocation(notebook.id, context.section?.id || null, context.chapter.id, context.topic.id),
+                        label: `Topic · ${buildPath(notebook.name, context.section?.name, context.chapter.name, context.topic.name)}`,
+                        name: context.topic.name,
+                        notebookId: notebook.id,
+                        sectionId: context.section?.id || null,
+                        chapterId: context.chapter.id,
+                        topicId: context.topic.id
+                    });
+                }
+            });
+        }
+
+        return locations;
+    }
+
+    function encodeLocation(notebookId, sectionId = null, chapterId = null, topicId = null) {
+        return [notebookId, sectionId || "", chapterId || "", topicId || ""].join("::");
+    }
+
+    function buildPath(...parts) {
+        return parts.filter(Boolean).join(" / ");
+    }
+
+    function renderTopicBookmarkForm(context) {
+        return `
+            <div class="stack">
+                <div class="form-group">
+                    <label for="bookmarkName">Bookmark name</label>
+                    <input class="field-input" id="bookmarkName" value="${escapeAttribute(context.topic.name)}">
+                </div>
+                <div class="form-group">
+                    <label for="bookmarkLevel">Bookmark level</label>
+                    <select class="field-select" id="bookmarkLevel">
+                        <option value="notebook">Notebook</option>
+                        ${context.section ? `<option value="section">Section</option>` : ""}
+                        <option value="chapter">Chapter</option>
+                        <option value="topic" selected>Topic</option>
+                    </select>
+                </div>
+            </div>
+        `;
     }
 
     function escapeHTML(value) {
@@ -128,6 +214,10 @@
             .replaceAll(">", "&gt;")
             .replaceAll('"', "&quot;")
             .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttribute(value) {
+        return escapeHTML(value);
     }
 
     ns.openBookmarkEditor = openBookmarkEditor;

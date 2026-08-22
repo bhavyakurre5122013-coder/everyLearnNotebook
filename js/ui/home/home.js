@@ -23,6 +23,13 @@
     const openDialog = (...args) => ns.openDialog(...args);
     const confirmAction = (...args) => ns.confirmAction(...args);
     const showToast = (...args) => ns.showToast(...args);
+    const getLibraryState = (...args) => ns.getLibraryState(...args);
+    const renderLibraryControls = (...args) => ns.renderLibraryControls(...args);
+    const initLibraryControls = (...args) => ns.initLibraryControls(...args);
+    const filterLibraryItems = (...args) => ns.filterLibraryItems(...args);
+    const sortLibraryItems = (...args) => ns.sortLibraryItems(...args);
+    const renderBookmarkLibrary = (...args) => ns.renderBookmarkLibrary(...args);
+    const openBookmarkEditor = (...args) => ns.openBookmarkEditor(...args);
 /*
 =============================================================
 everyLearn — Home / Library Pages
@@ -34,7 +41,8 @@ function isLibraryRoute() {
         ROUTES.HOME,
         ROUTES.SUBJECTS,
         ROUTES.NOTEBOOKS,
-        ROUTES.SUBJECT
+        ROUTES.SUBJECT,
+        ROUTES.BOOKMARKS
     ].includes(state.route);
 }
 
@@ -68,21 +76,45 @@ function clearSectionAction(sectionId) {
 function initHome() {
     document.getElementById("subjectGrid")?.addEventListener("click", onSubjectClick);
     document.getElementById("notebookGrid")?.addEventListener("click", onNotebookClick);
+    document.getElementById("bookmarkGrid")?.addEventListener("click", onBookmarkClick);
 
     document.addEventListener("everylearn:create-subject", () => openSubjectEditor());
     document.addEventListener("everylearn:create-notebook", () => openNotebookEditor());
+    document.addEventListener("everylearn:create-subject-notebook", () => {
+        if (state.route === ROUTES.SUBJECT && state.subjectPageId) {
+            openNotebookEditor(state.subjectPageId);
+        }
+    });
+    document.addEventListener("everylearn:create-bookmark", () => openBookmarkEditor({ libraryMode: true }));
     document.addEventListener("everylearn:open-notebook-editor", event => openNotebookEditor(event.detail?.subjectId || null));
     document.addEventListener("everylearn:edit-subject", event => openSubjectEditor(event.detail.subject));
     document.addEventListener("everylearn:delete-subject", event => removeSubject(event.detail.subjectId));
+    document.addEventListener("everylearn:library-filter", event => {
+        const key = event.detail?.key;
+        if (!key) return;
+        renderHome();
+        requestAnimationFrame(() => {
+            const input = document.querySelector(`[data-library-controls="${CSS.escape(key)}"] [data-library-search-input]`);
+            if (!input) return;
+            input.focus();
+            const end = input.value.length;
+            input.setSelectionRange(end, end);
+        });
+    });
+
+    initLibraryControls(document);
 }
 
 function renderHome() {
     const view = document.getElementById("homeView");
-    if (!view) return;
+    const bookmarksView = document.getElementById("bookmarksView");
+    if (!view || !bookmarksView) return;
 
-    const active = isLibraryRoute();
-    view.classList.toggle("hidden", !active);
-    if (!active) return;
+    const libraryActive = isLibraryRoute();
+    view.classList.toggle("hidden", !libraryActive || state.route === ROUTES.BOOKMARKS);
+    bookmarksView.classList.toggle("hidden", state.route !== ROUTES.BOOKMARKS);
+
+    if (!libraryActive) return;
 
     const subjectsSection = document.getElementById("subjectsSection");
     const notebooksSection = document.getElementById("notebooksSection");
@@ -92,11 +124,17 @@ function renderHome() {
     const homeSubtitle = document.getElementById("homeSubtitle");
     const headerActions = document.getElementById("homeHeaderActions");
 
-    // Default header actions: no "New notebook" shortcut in the upper right.
     headerActions.innerHTML = "";
+    document.getElementById("subjectsControls").innerHTML = "";
+    document.getElementById("notebooksControls").innerHTML = "";
 
     const allSubjects = listSubjects();
     const allNotebooks = listNotebooks();
+
+    if (state.route === ROUTES.BOOKMARKS) {
+        renderBookmarksPage();
+        return;
+    }
 
     if (state.route === ROUTES.HOME) {
         homeTitle.textContent = "everyLearnNotebook";
@@ -128,8 +166,21 @@ function renderHome() {
         subjectsSection?.classList.remove("hidden");
         notebooksSection?.classList.add("hidden");
         clearSectionAction("subjectsSection");
-        renderCreateSubjectCard();
-        renderSubjectGrid(allSubjects);
+
+        document.getElementById("subjectsControls").innerHTML = renderLibraryControls({
+            key: "subjects",
+            createLabel: "New Subject",
+            searchPlaceholder: "Search subjects"
+        });
+
+        const settings = getLibraryState("subjects");
+        let subjects = filterLibraryItems(
+            allSubjects,
+            settings,
+            subject => `${subject.name}`
+        );
+        subjects = sortLibraryItems(subjects, settings);
+        renderSubjectGrid(subjects, { view: settings.view, showCreateCard: false });
         return;
     }
 
@@ -141,8 +192,21 @@ function renderHome() {
         notebookHeading.textContent = "Notebooks";
         notebookDescription.textContent = "All notebooks across every subject.";
         clearSectionAction("notebooksSection");
-        renderCreateNotebookCard();
-        renderNotebookGrid(allNotebooks);
+
+        document.getElementById("notebooksControls").innerHTML = renderLibraryControls({
+            key: "notebooks",
+            createLabel: "New Notebook",
+            searchPlaceholder: "Search notebooks"
+        });
+
+        const settings = getLibraryState("notebooks");
+        let notebooks = filterLibraryItems(
+            allNotebooks,
+            settings,
+            notebook => `${notebook.name} ${notebook.description || ""} ${ns.getSubject(notebook.subjectId)?.name || ""}`
+        );
+        notebooks = sortLibraryItems(notebooks, settings);
+        renderNotebookGrid(notebooks, { view: settings.view, showCreateCard: false });
         return;
     }
 
@@ -169,11 +233,59 @@ function renderHome() {
     notebookHeading.textContent = "Notebooks";
     notebookDescription.textContent = `Notebooks linked to ${subject.name}.`;
     clearSectionAction("notebooksSection");
-    renderCreateNotebookCard();
-    renderNotebookGrid(allNotebooks.filter(notebook => notebook.subjectId === subject.id));
+
+    document.getElementById("notebooksControls").innerHTML = renderLibraryControls({
+        key: "subject-notebooks",
+        createLabel: "New Notebook",
+        searchPlaceholder: `Search ${subject.name} notebooks`
+    });
+
+    const settings = getLibraryState("subject-notebooks");
+    let notebooks = allNotebooks.filter(notebook => notebook.subjectId === subject.id);
+    notebooks = filterLibraryItems(
+        notebooks,
+        settings,
+        notebook => `${notebook.name} ${notebook.description || ""}`
+    );
+    notebooks = sortLibraryItems(notebooks, settings);
+    renderNotebookGrid(notebooks, { view: settings.view, showCreateCard: false });
+}
+
+function renderBookmarksPage() {
+    const settings = getLibraryState("bookmarks");
+    const controls = document.getElementById("bookmarksControls");
+    if (!controls) return;
+
+    controls.innerHTML = renderLibraryControls({
+        key: "bookmarks",
+        createLabel: "New Bookmark",
+        searchPlaceholder: "Search bookmarks"
+    });
+
+    renderBookmarkLibrary({
+        view: settings.view,
+        sort: settings.sort,
+        query: settings.query
+    });
+}
+
+function onBookmarkClick(event) {
+    const remove = event.target.closest("[data-delete-library-bookmark]");
+    if (remove) {
+        event.stopPropagation();
+        ns.deleteBookmarkFromLibrary?.(remove.dataset.deleteLibraryBookmark);
+        return;
+    }
+
+    const open = event.target.closest("[data-open-library-bookmark]");
+    if (open) {
+        ns.openBookmarkLocationById?.(open.dataset.openLibraryBookmark);
+    }
 }
 
 function onSubjectClick(event) {
+    if (event.target.closest("[data-item-menu]")) return;
+
     const create = event.target.closest("[data-create-subject]");
     if (create) {
         openSubjectEditor();
@@ -188,6 +300,8 @@ function onSubjectClick(event) {
 }
 
 function onNotebookClick(event) {
+    if (event.target.closest("[data-item-menu]")) return;
+
     const create = event.target.closest("[data-create-notebook]");
     if (create) {
         openNotebookEditor();
