@@ -584,6 +584,9 @@
             return;
         }
         ns.moveSection(state.notebookId, id, notebookId);
+        if (state.sectionId === id && notebookId !== state.notebookId) {
+            ns.resetWorkspaceSelection();
+        }
         close();
         rerenderAfterAction("section");
     }
@@ -603,9 +606,47 @@
             return;
         }
 
-        if (kind === "chapter") ns.moveChapter(state.notebookId, id, notebookId, destinationId);
-        if (kind === "topic") ns.moveTopic(state.notebookId, id, notebookId, destinationId);
-        if (kind === "question") ns.moveQuestion(state.notebookId, state.topicId, id, notebookId, destinationId);
+        if (kind === "chapter") {
+            ns.moveChapter(state.notebookId, id, notebookId, destinationId);
+
+            if (state.chapterId === id) {
+                if (notebookId === state.notebookId) {
+                    state.sectionId = destinationId || null;
+                    state.chapterId = id;
+                    state.topicId = null;
+                } else {
+                    ns.resetWorkspaceSelection();
+                }
+            }
+        }
+
+        if (kind === "topic") {
+            ns.moveTopic(state.notebookId, id, notebookId, destinationId);
+
+            if (state.topicId === id) {
+                if (notebookId === state.notebookId) {
+                    const parent = ns.findChapterParent(notebookId, destinationId);
+                    state.sectionId = parent?.section?.id || null;
+                    state.chapterId = destinationId;
+                    state.topicId = id;
+                } else {
+                    ns.resetWorkspaceSelection();
+                }
+            }
+        }
+
+        if (kind === "question") {
+            ns.moveQuestion(state.notebookId, state.topicId, id, notebookId, destinationId);
+
+            if (state.editingQuestionId === id) {
+                if (notebookId === state.notebookId) {
+                    state.topicId = destinationId;
+                } else {
+                    state.editingQuestionId = null;
+                    state.topicId = null;
+                }
+            }
+        }
 
         close();
         rerenderAfterAction(kind);
@@ -753,7 +794,12 @@
             if (!subject) return;
             const ok = await confirmAction({ title: "Delete subject?", message: linked.length ? `"${subject.name}" has ${linked.length} linked notebook${linked.length === 1 ? "" : "s"}. Deleting it will also delete those linked notebooks.` : `Delete "${subject.name}"?`, confirmText: "Delete subject" });
             if (!ok) return;
+            const activeNotebookDeleted = state.notebookId
+                && linked.some(notebook => notebook.id === state.notebookId);
             ns.deleteSubject(id);
+            if (activeNotebookDeleted) {
+                ns.goHome();
+            }
             return rerenderAfterAction(kind);
         }
         if (kind === "notebook") {
