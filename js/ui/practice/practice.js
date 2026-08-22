@@ -7,6 +7,22 @@
     const scoreForQuestion = (...args) => ns.scoreForQuestion(...args);
     const showToast = (...args) => ns.showToast(...args);
 
+    const resetPracticeSession = (...args) => ns.resetPracticeSession(...args);
+
+    function syncPracticeSession(sourceQuestions) {
+        const scopeKey = `${state.notebookId || ""}:${state.topicId || ""}`;
+        const questionSetKey = sourceQuestions
+            .map(question => question.id)
+            .sort()
+            .join("|");
+
+        if (state.practice.scopeKey !== scopeKey || state.practice.questionSetKey !== questionSetKey) {
+            resetPracticeSession();
+            state.practice.scopeKey = scopeKey;
+            state.practice.questionSetKey = questionSetKey;
+        }
+    }
+
     function renderPractice() {
         const mode = document.getElementById("practiceMode");
         if (!mode) return;
@@ -17,6 +33,7 @@
         mode.classList.remove("hidden");
 
         const sourceQuestions = listQuestions(state.notebookId, state.topicId);
+        syncPracticeSession(sourceQuestions);
         const questions = getPracticeQuestions(sourceQuestions);
         if (!questions.length) {
             mode.innerHTML = `

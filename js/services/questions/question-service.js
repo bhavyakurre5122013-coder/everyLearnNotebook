@@ -64,40 +64,81 @@ function deleteQuestion(notebookId, topicId, questionId) {
     saveStoredData(state.data);
 }
 
-function duplicateQuestion(notebookId, topicId, questionId) {
-    const original = getQuestion(notebookId, topicId, questionId);
-    if (!original) throw new Error("Question not found.");
-
-    const copy = structuredClone(original);
-    copy.id = `${original.id}_copy_${Date.now().toString(36)}`;
-    copy.attempts = 0;
-    copy.correct = 0;
-    copy.lastPractice = null;
-
-    getTopic(notebookId, topicId).questions.push(copy);
-    saveStoredData(state.data);
-    return copy;
-}
-
-
 function cloneQuestion(question) {
-    const copy = structuredClone(question);
-    const fresh = value => {
-        if (Array.isArray(value)) return value.map(fresh);
+    const source = structuredClone(question);
+    const idMap = new Map();
+
+    function prefixForId(id) {
+        const prefix = String(id).split("_")[0];
+        return prefix || "id";
+    }
+
+    function cloneValue(value) {
+        if (Array.isArray(value)) return value.map(cloneValue);
         if (!value || typeof value !== "object") return value;
+
         const result = {};
         for (const [key, item] of Object.entries(value)) {
-            result[key] = key === "id" && typeof item === "string"
-                ? createId(item.split("_")[0] || "id")
-                : fresh(item);
+            if (key === "id" && typeof item === "string") {
+                const newId = createId(prefixForId(item));
+                idMap.set(item, newId);
+                result[key] = newId;
+            } else {
+                result[key] = cloneValue(item);
+            }
         }
         return result;
-    };
-    const result = fresh(copy);
+    }
+
+    const result = cloneValue(source);
+
+    // Matching connections use pair IDs as object keys and values rather than
+    // storing those references under an `id` property. Remap this known
+    // reference structure at every nesting level; arbitrary strings elsewhere
+    // remain untouched.
+    function remapKnownReferences(sourceValue, resultValue) {
+        if (!sourceValue || typeof sourceValue !== "object" || !resultValue || typeof resultValue !== "object") {
+            return;
+        }
+
+        if (sourceValue.matchingConnections && typeof sourceValue.matchingConnections === "object") {
+            resultValue.matchingConnections = Object.fromEntries(
+                Object.entries(sourceValue.matchingConnections)
+                    .map(([left, right]) => [
+                        idMap.get(left) || left,
+                        idMap.get(right) || right
+                    ])
+            );
+        }
+
+        if (Array.isArray(sourceValue)) {
+            sourceValue.forEach((item, index) => remapKnownReferences(item, resultValue[index]));
+            return;
+        }
+
+        for (const key of Object.keys(sourceValue)) {
+            if (key !== "matchingConnections") {
+                remapKnownReferences(sourceValue[key], resultValue[key]);
+            }
+        }
+    }
+
+    remapKnownReferences(source, result);
+
     result.attempts = 0;
     result.correct = 0;
     result.lastPractice = null;
     return result;
+}
+
+function duplicateQuestion(notebookId, topicId, questionId) {
+    const original = getQuestion(notebookId, topicId, questionId);
+    if (!original) throw new Error("Question not found.");
+
+    const copy = cloneQuestion(original);
+    getTopic(notebookId, topicId).questions.push(copy);
+    saveStoredData(state.data);
+    return copy;
 }
 
 function moveQuestion(sourceNotebookId, sourceTopicId, questionId, destinationNotebookId, destinationTopicId) {

@@ -45,7 +45,9 @@ function openWorkspace(notebookId, topicId = null) {
     state.chapterId = null;
     state.topicId = topicId;
     state.subjectPageId = null;
-    state.practice.index = 0;
+    ns.resetPracticeSession();
+    state.practice.scopeKey = null;
+    state.practice.questionSetKey = null;
     state.editingQuestionId = null;
 }
 

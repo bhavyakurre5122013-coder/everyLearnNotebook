@@ -2,6 +2,7 @@
     "use strict";
     const state = ns.state;
     const openDialog = (...args) => ns.openDialog(...args);
+    const resetPracticeSession = (...args) => ns.resetPracticeSession(...args);
 /* everyLearn — Practice Settings */
 
 
@@ -114,11 +115,7 @@ function openPracticeSettings() {
             ).onclick = () => {
                 const nextRandom = host.querySelector("#practiceRandom").checked;
                 if (nextRandom !== state.practice.random) {
-                    state.practice.orderIds = [];
-                    state.practice.index = 0;
-                    state.practice.answers = {};
-                    state.practice.results = {};
-                    state.practice.exerciseComplete = false;
+                    resetPracticeSession();
                 }
                 state.practice.random = nextRandom;
 
