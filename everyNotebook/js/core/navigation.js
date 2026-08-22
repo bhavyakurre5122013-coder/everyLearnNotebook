@@ -47,6 +47,8 @@ function openWorkspace(notebookId, topicId = null) {
     state.subjectPageId = null;
     state.practice.index = 0;
     state.editingQuestionId = null;
+    state.editingQuestionDraft = null;
+    state.editingQuestionIsNew = false;
 }
 
 function isHome() {

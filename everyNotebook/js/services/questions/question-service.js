@@ -26,6 +26,7 @@ function addQuestion(notebookId, topicId, type = "text") {
     if (!topic) throw new Error("Topic not found.");
 
     const question = createQuestion(type);
+    ns.normalizeQuestion(question);
     topic.questions.push(question);
     saveStoredData(state.data);
     return question;
@@ -34,17 +35,43 @@ function addQuestion(notebookId, topicId, type = "text") {
 function updateQuestion(notebookId, topicId, questionId, changes) {
     const question = getQuestion(notebookId, topicId, questionId);
     if (!question) throw new Error("Question not found.");
+    if (!changes || typeof changes !== "object") throw new Error("Question changes are invalid.");
 
-    Object.assign(question, changes);
-    question.hints = Array.isArray(question.hints)
-        ? question.hints.slice(0, 4)
-        : [];
-    question.important = Math.max(
-        0, Math.min(3, Number(question.important) || 0)
-    );
-    question.difficulty = Math.max(
-        1, Math.min(3, Number(question.difficulty) || 1)
-    );
+    const next = structuredClone(question);
+    const incoming = structuredClone(changes);
+    const requestedType = incoming.type;
+    Object.assign(next, incoming);
+    next.id = question.id;
+
+    if (requestedType && requestedType !== question.type) {
+        ns.resetQuestionTypeData(next, requestedType);
+        const typeFields = {
+            text: ["answer"],
+            trueFalse: ["answer"],
+            fill: ["answerData"],
+            assertionReasoning: ["answerData"],
+            singleCorrect: ["options"],
+            multipleCorrect: ["options"],
+            ordering: ["orderItems"],
+            matching: ["pairs", "matchingConnections"],
+            difference: ["difference"],
+            caseBased: ["casePassage", "caseQuestions"]
+        };
+        for (const field of typeFields[requestedType] || []) {
+            if (Object.prototype.hasOwnProperty.call(incoming, field)) {
+                next[field] = structuredClone(incoming[field]);
+            }
+        }
+    }
+
+    ns.normalizeQuestion(next);
+    const errors = ns.validateQuestion(next);
+    if (errors.length) throw new Error(errors[0]);
+
+    Object.keys(question).forEach(key => {
+        if (!(key in next)) delete question[key];
+    });
+    Object.assign(question, next);
 
     saveStoredData(state.data);
     return question;
@@ -69,7 +96,6 @@ function duplicateQuestion(notebookId, topicId, questionId) {
     if (!original) throw new Error("Question not found.");
 
     const copy = cloneQuestion(original);
-
     getTopic(notebookId, topicId).questions.push(copy);
     saveStoredData(state.data);
     return copy;
@@ -78,22 +104,53 @@ function duplicateQuestion(notebookId, topicId, questionId) {
 
 function cloneQuestion(question) {
     const copy = structuredClone(question);
-    const fresh = value => {
-        if (Array.isArray(value)) return value.map(fresh);
-        if (!value || typeof value !== "object") return value;
-        const result = {};
-        for (const [key, item] of Object.entries(value)) {
-            result[key] = key === "id" && typeof item === "string"
-                ? createId(item.split("_")[0] || "id")
-                : fresh(item);
+    const idMap = new Map();
+
+    function regenerateIds(value) {
+        if (Array.isArray(value)) {
+            value.forEach(regenerateIds);
+            return;
         }
-        return result;
-    };
-    const result = fresh(copy);
-    result.attempts = 0;
-    result.correct = 0;
-    result.lastPractice = null;
-    return result;
+        if (!value || typeof value !== "object") return;
+
+        if (typeof value.id === "string" && value.id) {
+            const oldId = value.id;
+            const prefix = oldId.split("_")[0] || "id";
+            const newId = createId(prefix);
+            idMap.set(oldId, newId);
+            value.id = newId;
+        }
+
+        Object.values(value).forEach(regenerateIds);
+    }
+
+    function remapReferences(value) {
+        if (Array.isArray(value)) {
+            value.forEach(remapReferences);
+            return;
+        }
+        if (!value || typeof value !== "object") return;
+
+        if (value.matchingConnections && typeof value.matchingConnections === "object" && !Array.isArray(value.matchingConnections)) {
+            const remapped = {};
+            for (const [left, right] of Object.entries(value.matchingConnections)) {
+                const newLeft = idMap.get(left) || left;
+                const newRight = idMap.get(String(right)) || right;
+                remapped[newLeft] = newRight;
+            }
+            value.matchingConnections = remapped;
+        }
+
+        Object.values(value).forEach(remapReferences);
+    }
+
+    regenerateIds(copy);
+    remapReferences(copy);
+    copy.attempts = 0;
+    copy.correct = 0;
+    copy.lastPractice = null;
+    ns.normalizeQuestion(copy);
+    return copy;
 }
 
 function moveQuestion(sourceNotebookId, sourceTopicId, questionId, destinationNotebookId, destinationTopicId) {
