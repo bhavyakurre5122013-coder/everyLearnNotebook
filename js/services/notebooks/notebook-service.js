@@ -88,7 +88,13 @@ function duplicateNotebook(id, name, subjectId = null) {
 function moveNotebook(id, subjectId) {
     const notebook = getNotebook(id);
     if (!notebook) throw new Error("Notebook not found.");
-    notebook.subjectId = subjectId || null;
+
+    const destinationSubjectId = subjectId || null;
+    if (destinationSubjectId && !ns.getSubject(destinationSubjectId)) {
+        throw new Error("Destination subject not found.");
+    }
+
+    notebook.subjectId = destinationSubjectId;
     notebook.updatedAt = Date.now();
     saveStoredData(state.data);
     return notebook;

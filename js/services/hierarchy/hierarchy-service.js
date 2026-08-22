@@ -321,10 +321,25 @@ function findChapterParent(notebookId, chapterId) {
 }
 
 function moveSection(sourceNotebookId, sectionId, destinationNotebookId) {
-    const section = removeSectionFromNotebook(sourceNotebookId, sectionId);
-    requireNotebook(destinationNotebookId).sections.push(section);
+    const sourceNotebook = requireNotebook(sourceNotebookId);
+    const section = sourceNotebook.sections.find(item => item.id === sectionId);
+    if (!section) throw new Error("Section not found.");
+
+    const destinationNotebook = requireNotebook(destinationNotebookId);
+
+    if (sourceNotebookId === destinationNotebookId) {
+        const index = sourceNotebook.sections.findIndex(item => item.id === sectionId);
+        if (index < 0) throw new Error("Section not found.");
+        sourceNotebook.sections.splice(index, 1);
+        destinationNotebook.sections.push(section);
+        touchNotebook(sourceNotebookId);
+        return section;
+    }
+
+    sourceNotebook.sections = sourceNotebook.sections.filter(item => item.id !== sectionId);
+    destinationNotebook.sections.push(section);
     touchNotebook(sourceNotebookId);
-    if (destinationNotebookId !== sourceNotebookId) touchNotebook(destinationNotebookId);
+    touchNotebook(destinationNotebookId);
     return section;
 }
 
@@ -339,20 +354,45 @@ function duplicateSection(sourceNotebookId, sectionId, destinationNotebookId, na
 }
 
 function moveChapter(sourceNotebookId, chapterId, destinationNotebookId, destinationSectionId = null) {
-    if (sourceNotebookId === destinationNotebookId && destinationSectionId && getChapter(sourceNotebookId, chapterId)?.id === chapterId) {
-        const parent = findChapterParent(sourceNotebookId, chapterId);
-        if (parent?.section?.id === destinationSectionId) return getChapter(sourceNotebookId, chapterId);
-    }
-    const chapter = removeChapterFromNotebook(sourceNotebookId, chapterId);
-    const destination = requireNotebook(destinationNotebookId);
+    const sourceNotebook = requireNotebook(sourceNotebookId);
+    const chapter = getChapter(sourceNotebookId, chapterId);
+    if (!chapter) throw new Error("Chapter not found.");
+
+    const sourceParent = findChapterParent(sourceNotebookId, chapterId);
+    if (!sourceParent) throw new Error("Chapter not found.");
+
+    const destinationNotebook = requireNotebook(destinationNotebookId);
+    let destinationSection = null;
+
     if (destinationSectionId) {
-        const section = getSection(destinationNotebookId, destinationSectionId);
-        if (!section) throw new Error("Destination section not found.");
-        section.chapters = Array.isArray(section.chapters) ? section.chapters : [];
-        section.chapters.push(chapter);
-    } else {
-        destination.rootChapters.push(chapter);
+        destinationSection = getSection(destinationNotebookId, destinationSectionId);
+        if (!destinationSection) throw new Error("Destination section not found.");
+        destinationSection.chapters = Array.isArray(destinationSection.chapters)
+            ? destinationSection.chapters
+            : [];
+
+        if (destinationNotebookId === sourceNotebookId &&
+            sourceParent.section?.id === destinationSectionId) {
+            return chapter;
+        }
     }
+
+    if (sourceParent.section) {
+        const sourceIndex = sourceParent.section.chapters.findIndex(item => item.id === chapterId);
+        if (sourceIndex < 0) throw new Error("Chapter not found.");
+        sourceParent.section.chapters.splice(sourceIndex, 1);
+    } else {
+        const sourceIndex = sourceNotebook.rootChapters.findIndex(item => item.id === chapterId);
+        if (sourceIndex < 0) throw new Error("Chapter not found.");
+        sourceNotebook.rootChapters.splice(sourceIndex, 1);
+    }
+
+    if (destinationSection) {
+        destinationSection.chapters.push(chapter);
+    } else {
+        destinationNotebook.rootChapters.push(chapter);
+    }
+
     touchNotebook(sourceNotebookId);
     if (destinationNotebookId !== sourceNotebookId) touchNotebook(destinationNotebookId);
     return chapter;
@@ -377,11 +417,30 @@ function duplicateChapter(sourceNotebookId, chapterId, destinationNotebookId, de
 }
 
 function moveTopic(sourceNotebookId, topicId, destinationNotebookId, destinationChapterId) {
-    const topic = removeTopicFromNotebook(sourceNotebookId, topicId);
-    const chapter = getChapter(destinationNotebookId, destinationChapterId);
-    if (!chapter) throw new Error("Destination chapter not found.");
-    chapter.topics = Array.isArray(chapter.topics) ? chapter.topics : [];
-    chapter.topics.push(topic);
+    const sourceNotebook = requireNotebook(sourceNotebookId);
+    const sourceContext = findTopicContext(sourceNotebookId, topicId);
+    if (!sourceContext) throw new Error("Topic not found.");
+
+    const destinationNotebook = requireNotebook(destinationNotebookId);
+    const destinationChapter = getChapter(destinationNotebookId, destinationChapterId);
+    if (!destinationChapter) throw new Error("Destination chapter not found.");
+
+    if (destinationNotebookId === sourceNotebookId &&
+        sourceContext.chapter.id === destinationChapterId) {
+        return sourceContext.topic;
+    }
+
+    const topic = sourceContext.topic;
+    const sourceTopics = sourceContext.chapter.topics;
+    const sourceIndex = sourceTopics.findIndex(item => item.id === topicId);
+    if (sourceIndex < 0) throw new Error("Topic not found.");
+
+    sourceTopics.splice(sourceIndex, 1);
+    destinationChapter.topics = Array.isArray(destinationChapter.topics)
+        ? destinationChapter.topics
+        : [];
+    destinationChapter.topics.push(topic);
+
     touchNotebook(sourceNotebookId);
     if (destinationNotebookId !== sourceNotebookId) touchNotebook(destinationNotebookId);
     return topic;
